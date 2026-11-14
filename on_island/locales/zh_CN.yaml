@@ -1,0 +1,612 @@
+item:
+  berry: { name: 浆果, desc: 可以吃的浆果。 }
+  sand: { name: 沙子, desc: 一把细沙。 }
+  soil_clod: { name: 土块, desc: 一团泥土。 }
+  mud_clod: { name: 泥块, desc: 一团湿泥。 }
+  plastic_bottle: { name: 塑料瓶, desc: 平平无奇的500毫升塑料瓶。 }
+  small_branch: { name: 小树枝, desc: 长15厘米的树枝尖端。 }
+  branch: { name: 树枝, desc: 长30厘米的树枝。 }
+  big_branch: { name: 大树枝, desc: 长70厘米的粗大树枝。 }
+  short_stick: { name: 短木棍, desc: 长约16厘米的脆弱木棍。 }
+  stick: { name: 木棍, desc: 长约40厘米的坚实木棍。 }
+  long_stick: { name: 长木棍, desc: 长约120厘米的坚实木棍。 }
+  berry_branch:
+    { name: 浆果枝, desc: 从浆果丛上摘下来的枝条，上面挂了许多浆果。 }
+  berry_bush: { name: 浆果丛, desc: 浆果丛，上面结满了浆果。 }
+  berry_bush_harvested:
+    { name: 浆果丛（已采摘）, desc: 浆果丛，已被采摘，没有浆果。 }
+  biscuit: { name: 饼干, desc: 扁平的饼干，吃了会让你口渴。 }
+  water: { name: 水, desc: 清凉的水，可以饮用。 }
+  alcohol: { name: 医用酒精, desc: 用于清洁伤口；消毒时会引起刺痛。 }
+  cotton_strip: { name: 棉布条, desc: 可用于覆盖伤口的简易布条。 }
+  bandage: { name: 绷带, desc: 用于包扎伤口并减少伤口受潮。 }
+  sea_water:
+    { name: 海水, desc: 盐分对于人类来说过多的海水，喝下它会越来越渴。 }
+  living_fish: { name: 活海鱼, desc: 来自浅海的咸水鱼。 }
+  living_freshwater_fish: { name: 活淡水鱼, desc: 来自河流或湖泊的淡水鱼。 }
+  living_boar: { name: 野猪, desc: 具有攻击性的野生动物。 }
+  living_deer: { name: 鹿, desc: 温顺的草食动物。 }
+  living_rabbit: { name: 野兔, desc: 体型小巧的草食动物。 }
+  raw_pork: { name: 生猪肉, desc: 从野猪身上取得的肉，可以食用。 }
+  raw_venison: { name: 生鹿肉, desc: 从鹿身上取得的肉，可以食用。 }
+  raw_rabbit: { name: 生兔肉, desc: 从野兔身上取得的肉，可以食用。 }
+  animal_hide: { name: 兽皮, desc: 从动物尸体上剥下的皮革材料。 }
+  bone: { name: 骨头, desc: 从动物尸体上取得的骨骼材料。 }
+  dead_fish: { name: 海鱼尸体, desc: 可以从中取得海鱼肉的鱼尸体。 }
+  raw_freshwater_fish:
+    { name: 生淡水鱼, desc: 来自河流或湖泊的鱼肉，可以食用。 }
+  grilled_freshwater_fish: { name: 烤淡水鱼, desc: 烤熟的淡水鱼，可以食用。 }
+  dead_freshwater_fish:
+    { name: 淡水鱼尸体, desc: 可以从中取得淡水鱼肉的鱼尸体。 }
+  dead_boar: { name: 野猪尸体, desc: 可以从中取得肉、兽皮和骨头。 }
+  dead_deer: { name: 鹿尸体, desc: 可以从中取得鹿肉、兽皮和骨头。 }
+  dead_rabbit: { name: 野兔尸体, desc: 可以从中取得兔肉、兽皮和骨头。 }
+  grass: { name: 草, desc: 割下来的青草。 }
+  grass_patch: { name: 草丛, desc: 可以采集青草的野草丛。 }
+  raw_fish: { name: 生海鱼, desc: 来自浅海的海鱼肉，可以食用。 }
+  grilled_fish: { name: 烤鱼, desc: 烤熟的鱼，能吃。水分稍有减少，但更美味。 }
+  wood: { name: 原木, desc: 一大段原木。 }
+  rock: { name: 石块, desc: 坚硬的石块。 }
+  flint: { name: 燧石, desc: 尖端锋利的坚硬岩石，可用于制作工具。 }
+  big_rock: { name: 大石块, desc: 矗立的大石块。 }
+  workbench: { name: 工作台, desc: 可以稳固放置物品并进行精细合成的工作台。 }
+  tree_vine: { name: 树藤, desc: 长而柔韧的树藤。 }
+  dry_tree_vine: { name: 干树藤, desc: 经过烘干的树藤，适合编织。 }
+  vine_backpack: { name: 树藤背包, desc: 用干树藤编织而成的背包。 }
+  paused_craft:
+    name: 合成中的材料
+    desc: 已开始但尚未完成的合成；可以继续制作或拆解取回材料。
+  canvas_backpack: { name: 帆布背包, desc: 常见款式的帆布背包。 }
+  cotton_underwear: { name: 棉质内衣, desc: 贴身穿着的棉质衣物。 }
+  cotton_panties: { name: 棉质内裤, desc: 贴身穿着的棉质内裤。 }
+  compass: { name: 指南针, desc: 用来查看当前朝向的绝对方位。 }
+  watch: { name: 手表, desc: 用来查看当前的精确时间。 }
+  thermometer: { name: 温度计, desc: 用来测量当前环境的精确温度。 }
+  thick_plastic_film:
+    { name: 厚塑料膜, desc: 从充气救生艇上拆下来的厚实塑料膜。 }
+
+biome:
+  plain: { name: 平原, desc: 地势开阔的平原，土壤适合植物生长。 }
+  beach: { name: 海滩, desc: 一片金黄的海滩。 }
+  shallow_sea: { name: 浅海, desc: 海边的水域，礁石嶙峋。 }
+  river: { name: 河流, desc: 穿过岛屿的小型淡水河道。 }
+  lake: { name: 湖泊, desc: 岛内的小型静水淡水湖。 }
+  forest: { name: 森林, desc: 一片茂密的森林，树木高耸入云。 }
+
+terrain:
+  stranded_lifeboat: { name: 搁浅的充气救生艇, desc: 一艘搁浅在海岸边的塑料充气救生艇。 }
+  tree: { name: 树木, desc: 一棵矗立的树。 }
+  suspension: { name: 水体, desc: 一汪水。 }
+
+material:
+  soil: { name: 土壤, desc: 松软的泥土，混着草根和碎石。 }
+  sand: { name: 沙子, desc: 细小的沙粒。 }
+  mud: { name: 淤泥, desc: 潮湿粘稠的泥。 }
+  gravel: { name: 砾石, desc: 混杂着燧石的碎石子。 }
+  rubble: { name: 碎石, desc: 崩落下来的石块。 }
+  stone: { name: 岩石, desc: 结实的石块。 }
+  tree_root: { name: 树根, desc: 埋在土里的根系。 }
+  wood: { name: 木材, desc: 树木的木质部分。 }
+  leaf: { name: 树叶, desc: 成团的树叶。 }
+  lifeboat: { name: 救生艇, desc: 橡胶材质的艇身。 }
+  water: { name: 水, desc: 可以饮用的水。 }
+  salt: { name: 盐分, desc: 溶在水里的盐。 }
+  microorganisms: { name: 微生物, desc: 水中的微生物。 }
+  detritus: { name: 腐屑, desc: 水中的有机碎屑。 }
+  suspended_sand: { name: 悬浮沙, desc: 悬浮在水中的细沙。 }
+  suspended_mud: { name: 悬浮泥, desc: 悬浮在水中的泥。 }
+
+creature:
+  fish: { name: 海鱼 }
+  saltwater_fish: { name: 海鱼 }
+  freshwater_fish: { name: 淡水鱼 }
+  wild_boar: { name: 野猪 }
+  deer: { name: 鹿 }
+  rabbit: { name: 野兔 }
+  sex: { female: 雌性, male: 雄性 }
+
+attr:
+  health: { name: 生命, desc: 角色的生命值。 }
+  energy: { name: 能量, desc: 角色的热量，主要通过食物摄入。 }
+  water: { name: 水分, desc: 角色的水分。 }
+  fatigue:
+    name: 疲劳
+    desc: 疲劳会降低行动效率并增加能量和水分消耗，休息或睡眠可以恢复。
+  sleep_debt: { name: 睡眠不足, desc: 长时间不睡觉会降低效率、力量和情绪。 }
+  mood: { name: 总心情, desc: 由惊恐、不适、睡眠不足和满足共同影响。 }
+  pain: { name: 总疼痛, desc: 身体部位疼痛的平均值。 }
+  injury: { name: 总损伤, desc: 身体部位损伤的平均值。 }
+  adrenaline: { name: 肾上腺素, desc: 受伤后升高并随时间逐渐消退的应激反应。 }
+  body_strength: { name: 平均有效力量 }
+  emotion: { panic: 惊恐, pain: 疼痛, tire: 疲倦, satisfaction: 满足 }
+  perception: { name: 感知, desc: 感知决定显示信息的精度，不会增加视距。 }
+  air_temperature: { name: 气温, desc: 需要温度计才能得知。 }
+  body_temperature: { name: 体温, desc: 需要温度计才能在检查自身时得知。 }
+
+body_part:
+  head:
+    name: 头部
+    skull: { name: 头颅 }
+    face:
+      name: 面部
+      eyes: { name: 眼睛 }
+      nose: { name: 鼻子 }
+      ears: { name: 耳朵 }
+      mouth: { name: 嘴部 }
+  neck: { name: 颈部, throat: { name: 喉部 }, nape: { name: 后颈 } }
+  torso:
+    name: 躯干
+    chest: { name: 胸部 }
+    abdomen: { name: 腹部 }
+    back: { name: 背部 }
+  left_arm:
+    name: 左臂
+    shoulder: { name: 肩部 }
+    upper_arm: { name: 上臂 }
+    elbow: { name: 肘部 }
+    forearm: { name: 前臂 }
+    hand: { name: 左手, palm: { name: 手掌 }, fingers: { name: 手指 } }
+  right_arm:
+    name: 右臂
+    shoulder: { name: 肩部 }
+    upper_arm: { name: 上臂 }
+    elbow: { name: 肘部 }
+    forearm: { name: 前臂 }
+    hand: { name: 右手, palm: { name: 手掌 }, fingers: { name: 手指 } }
+  left_hand: { name: 左手 }
+  right_hand: { name: 右手 }
+  left_leg:
+    name: 左腿
+    thigh: { name: 大腿 }
+    knee: { name: 膝部 }
+    calf: { name: 小腿 }
+    foot:
+      name: 脚部
+      ankle: { name: 脚踝 }
+      sole: { name: 脚掌 }
+      toes: { name: 脚趾 }
+  right_leg:
+    name: 右腿
+    thigh: { name: 大腿 }
+    knee: { name: 膝部 }
+    calf: { name: 小腿 }
+    foot:
+      name: 脚部
+      ankle: { name: 脚踝 }
+      sole: { name: 脚掌 }
+      toes: { name: 脚趾 }
+  back: { name: 背部 }
+
+wound:
+  blunt: { name: 重击伤 }
+  bruise: { name: 淤青 }
+  cut: { name: 切口 }
+  puncture: { name: 刺伤 }
+  bandaged: 已包扎
+  sterilized: 已消毒
+  infected: 化脓
+  wet: 潮湿
+
+location.name: 位置
+
+angle: { yaw: 偏航角, pitch: 俯仰角, roll: 翻滚角 }
+
+game:
+  title: "=== 在岛上 ==="
+  debug_position: "调试绝对坐标：(%{x}, %{y}, %{z})"
+  body_part_status: "%{name}：力 %{strength}% 疲 %{fatigue}% 痛 %{pain}% 伤 %{damage}%（%{wounds}）"
+  no_wounds: 无伤口
+  status_line: "[x]检查自身 [l]观察周围 [m]移动/旋转 [i]物品栏 [f]战斗 [c]合成 [r]休息 [j]日志 [$]选项 [q]退出"
+  log_repeat: "%{message} ×%{count}"
+  log_footer: "──────── 日志 ────────"
+  self_inspection:
+    title: 状态
+    prompt: 按任意键返回主界面
+    took_time: 你花费了1分钟检查自身状态。
+    repeated: 你刚刚检查过自身状态。
+  relative_status: " 相对%{origin}：%{angle}，%{distance}米"
+  wait_active: "%{action} %{progress}% [空格]暂停 [Esc]退出"
+  wait_paused: "%{action} %{progress}%（已暂停）[空格]继续 [Esc]退出"
+  wait_no_object: 无
+  location: 坐标 (%{x}, %{y}, %{z})
+  over: 游戏结束！
+  over_message: 游戏结束：%{message}
+  quit: 你关闭了游戏。
+game.effects: 状态：
+game.status:
+  health: { critical: 危急, poor: 受伤, fair: 尚可, good: 良好 }
+  energy: { depleted: 精力枯竭, low: 精力不足, fair: 精力一般, sufficient: 精力充足 }
+  water: { dehydrated: 严重缺水, thirsty: 口渴, low: 水分偏低, hydrated: 水分充足 }
+  fatigue: { energetic: 精力充沛, slightly_tired: 略感疲劳, tired: 疲惫, exhausted: 精疲力竭 }
+  mood: { very_low: 心情低落, low: 心情欠佳, neutral: 心情平静, good: 心情愉快 }
+  pain: { none: 无疼痛, mild: 轻微疼痛, moderate: 疼痛明显, severe: 剧烈疼痛 }
+  injury: { none: 未受损伤, minor: 轻微损伤, moderate: 明显损伤, severe: 严重损伤 }
+
+damage:
+  starve: 你被饿死了！
+  dehydrate: 你被渴死了！
+  injure: 你伤重而死！
+  generic: 你死了！
+
+wait_action_result:
+  interrupted: { name: 行动被打断。 }
+  item_too_heavy: { name: 物品过重，无法用双手持起。 }
+
+action:
+  log:
+    title: "=== 日志 ==="
+    title_with_count: "=== 日志（共%{count}条）===  [Esc]返回"
+    empty: 还没有完成或失败的操作记录。
+    back: "[Esc]返回"
+    index_line: "索引 %{index}/%{groups}，显示 %{entries} 条记录，合并：%{merge}"
+    separator: ────────────────────────────────
+    merged: "  [%{member}/%{total}]"
+    merge_on: 开
+    merge_off: 关
+    footer: "[↑↓/Ctrl]选择 [←→]切换同一消息 [c]合并 [$]选项 [Esc]返回"
+  combat:
+    title: "=== 战斗 ==="
+    no_target: 附近没有可攻击的生物。
+    target_title: 目标（↑↓切换）
+    target_entry: "%{name} %{angle}，%{distance}米，生命 %{health}%"
+    target: "%{name} %{distance}米"
+    attack_title: 选择攻击方式
+    attack_entry: "%{name}：%{damage_type}，伤害 %{amount}%，距离 %{range}"
+    unarmed: 徒手攻击
+    limb_title: 选择攻击肢体
+    auto_limb: 自动选择最有力的肢体
+    action: 攻击%{target}
+    target_gone: 目标已不在此处。
+    hit: 你使用%{limb}对%{target}造成%{damage_type}伤害 %{amount}%，目标剩余生命 %{health}%。
+    defeated: 你击败了%{target}（造成伤害 %{amount}%），尸体留在目标位置，可以采集。
+    counterattack: "%{target}反击，击中你的%{limb}，造成伤害 %{amount}%。"
+    blunt: 钝击
+    piercing: 刺击
+    slashing: 斩击
+    footer: "[↑↓]目标 [←→或-/+]攻击方式 [</>]肢体 [Enter/a]攻击 [$]选项 [Esc]退出"
+  inventory:
+    title: "=== 物品栏 ==="
+    index_line: "索引 %{index}/%{entries}，可见物品 %{objects} 个"
+    entry: "%{name} ×%{count} %{volume} %{weight} - %{desc}"
+    filter_carried: "[i]背包"
+    filter_worn: "[w]穿戴"
+    filter_nearby: "[p]周围"
+    filter_usable: "[u]仅可用"
+    separator: ────────────────────────────────
+    tag_carried: 背包
+    tag_worn: 穿戴
+    tag_nearby: 周围
+    worn_line: "%{name} %{volume} %{weight}"
+    carried_line: "%{name} ×%{count} %{volume} %{weight}"
+    nearby_line: "%{name} ×%{count} %{angle}，%{distance}米"
+    filter_help: "[类别键]操作 [Shift+类别键]过滤 [Alt+类别键]独占过滤"
+    footer: "[↑↓/Ctrl]选择 [Enter]默认操作 [$]选项 [Esc]返回"
+    actions: "操作：%{actions}"
+    selected: "> %{text}\n  %{desc}"
+    empty: （当前过滤条件下没有可见物品）
+    no_action: "%{name}没有可直接使用的功能。\n%{desc}"
+    not_usable: 所选物品不能使用。
+    not_wearable: 所选物品不能穿戴。
+    not_nearby: 所选物品不在周围。
+    not_worn: 所选物品没有穿戴在身上。
+    not_carried: 背包里没有这个物品。
+    hand_unavailable: 双手都被占用，无法手持该物品。
+    held: 已将%{name}拿在手上。
+    inspect: "> %{name}\n%{desc}"
+    not_wearable_item: "%{name}无法穿戴。"
+    equipped: 已穿戴%{name}。
+    act_use: 使用
+    act_wear: 穿戴
+    act_unequip: 脱下
+    act_hold: 手持
+    act_pickup: 拾取
+    act_look: 查看
+  worn:
+    title: 穿戴/脱下物品
+    equip: 从物品栏穿戴物品
+    equip_title: 选择穿戴物品
+    equip_entry: "%{name} ×%{count} - %{desc}"
+    entry: "%{name} %{volume} %{weight} - %{desc}"
+    unequip_failed: 无法脱下%{name}：物品栏空间不足。
+    unequipped: 已脱下%{name}。
+    unequipped_held: 物品栏空间不足，已脱下%{name}并拿在手上。
+    unequipped_dropped: 物品栏和双手都放不下，已把%{name}放在地上。
+  pickup:
+    action: 拾取%{item}
+    done: "拾取了%{item} ×%{count}。"
+
+    none: 这里没有能拾取的东西！
+    title: 拾取
+    choose: 选择要拾取的物品编号
+    how_many: 拾取多少？
+    how_many_hold: 手持多少？
+    remaining: 你无法拾取剩下的%{count}个物品！
+    held: "背包放不下，已把%{item} ×%{count}拿在手上。"
+    in_hand: "已将%{item} ×%{count}拿在手上。"
+    dropped: "背包和双手都放不下，已把%{item} ×%{count}放在地上。"
+    unavailable: 目标物品在到达前已消失。
+    entry: "%{name} ×%{count} %{angle}，%{distance}米（每个%{duration}秒，%{activity}×活动）- %{desc}"
+  mine:
+    action: 开采%{mixture}
+    title: 开采地表资源
+    entry: "%{mixture} %{angle}，%{distance}米"
+    how_many: 开采几次？
+    share: "%{name} %{percent}%"
+    none: 附近没有可以开采的地表资源。
+    exhausted: 这块资源已经被采空了。
+    done: 已将开采出的物品放进背包（放不下的留在原地）。
+  gather:
+    action: 采集%{item}
+    done: "采集了%{item} ×%{count}。"
+
+    title: 采集
+    choose: 选择要采集的物品编号
+    how_many: 采集多少？
+    none: 附近没有可采集的资源。
+    unavailable: 目标资源在到达前已消失。
+    entry: "%{name} ×%{count} %{angle}，%{distance}米 - %{desc}"
+  movement:
+    action: 前往%{target}
+    target_str: 目的地
+    title: "=== 移动/旋转 ==="
+    screen_position: 坐标 (%{x}, %{y}, %{z})，距原点%{distance}米，朝向%{direction}
+    screen_view: 偏航 %{yaw}°，俯仰 %{pitch}°，步长 %{step}米
+    screen_help: "[↑↓←→]旋转视角 [WASD]移动 [＋/－]调整步长 [Esc]返回"
+    origin_title: 选择相对坐标原点（当前：%{origin}）
+    origin_entry: "%{name} %{angle}，%{distance}米"
+    origin_selected: 相对坐标原点已设为%{origin}。
+  look:
+    title: 查看（%{period}，%{weather}）
+    biome: "生物群系：%{name} %{angle}，%{distance}米"
+    bookmark: "已记录坐标%{index} %{angle}，%{distance}米"
+    bookmark_desc: 你之前记录下的一个位置。
+    terrain: "地形：%{name} %{angle}，%{distance}米"
+    item: "物品：%{name} ×%{count} %{angle}，%{distance}米"
+    creature: "生物：%{name}（%{sex}） %{angle}，%{distance}米"
+    desc: "%{target}\n%{desc}"
+  observe:
+    title: "=== 观察周围 ===（%{period}，%{weather}）"
+    title_mode: "=== 观察周围 ===（%{period}，%{weather}，%{mode}）"
+    mode_observe: 观察
+    mode_move: 移动
+    summary: 位于%{location}，朝向%{direction}，俯仰%{pitch}°
+    location: 地点
+    bookmark: 书签
+    terrain: 地物/生物
+    surface: 表面
+    pickup: 物品
+    gather: 采集
+    deposit: 开采
+    index_line: "索引 %{index}/%{groups}，可见对象 %{objects} 个，方位：%{direction}，合并：%{merge}"
+    direction_all: 全部
+    merge_on: 开
+    merge_off: 关
+    separator: ────────────────────────────────
+    empty: （当前过滤条件下没有可见对象）
+    merged: "  [%{member}/%{total}]"
+    filter_help: "[类别键]操作 [Shift+类别键]过滤 [Alt+类别键]独占过滤 [d]方位过滤"
+    footer: "[m]移动模式 [↑↓]选择 [←→]切换同类 [Enter]查看 [c]合并 [i]物品栏 [f]战斗 [o]坐标原点 [$]选项 [Esc]返回"
+    move_footer: "[m]观察模式 [↑↓]俯仰 [←→]转向 [WASD]移动 [+/-]步长 [c]合并 [Esc]返回"
+    move_state: "步长 %{step}米 %{status}"
+    selected: "> %{target}\n  %{desc}"
+    actions: "操作：%{actions}"
+    act_travel: 前往
+    act_look: 查看
+    act_surface: 操作
+    act_pickup: 拾取
+    act_hold: 手持
+    act_wear: 穿戴
+    act_gather: 采集
+    act_mine: 开采
+    surface_desc: 可以在上面放置或取回物品。
+    gather_entry: "采集：%{name} ×%{count} %{angle}，%{distance}米"
+    deposit_entry: "开采：%{mixture} %{angle}，%{distance}米"
+    deposit_desc: 地表资源：%{mixture}
+  surface:
+    title: 合成表面
+    no_surface: 所选合成表面已不存在。
+    entry: "%{kind} %{angle}，%{distance}米"
+    flat_stone: 平坦大石
+    workbench: 工作台
+    actions: 选择表面操作
+    place: 放置背包物品
+    take: 收回表面物品
+    place_workbench: 在当前位置放置工作台
+    no_items: 没有可放置的背包物品。
+    no_surface_items: 表面上没有物品。
+    placed: 已将%{item}放在%{surface}上。
+    taken: 已从%{surface}收回%{item}。
+    workbench_placed: 已在当前位置放置工作台。
+  rest:
+    title: "=== 休息 ===（疲劳 %{fatigue}%）%{notice}"
+    rest: 休息
+    sleep: 睡觉
+    sleep_unavailable: 睡觉（精神充沛，睡不着）
+    back: 返回
+    action: "休息%{minutes}分钟"
+    done: 休息结束，体力有所恢复。
+    duration: 休息时长
+
+  sleep:
+    action: "睡觉%{hours}小时"
+    done: 你睡了一觉，精神有所恢复。
+    too_energetic: 你现在精神充沛，睡不着。
+    duration: 睡眠时长
+  medical:
+    target: 选择需要处理的身体部位
+    target_entry: "%{part}（伤口 %{wounds}处）"
+    no_wound: 该部位没有可处理的伤口，物品未消耗。
+    treated: 已处理%{part}的伤口。
+  use_item:
+    title: 使用物品
+    done: "使用了%{item} ×%{count}。"
+
+    choose: 选择要使用的物品编号
+    entry: "%{name} ×%{count} - %{desc}"
+    compass: 当前朝向：%{bearing}。
+    watch: 当前时间：%{time}。
+    thermometer: 当前温度：%{temperature}°C。
+    how_many: 使用多少次？
+    data.title: 使用%{item}
+    data: "%{name} (每个%{duration}秒，%{activity}×活动) - %{desc}"
+    paused:
+      title: 使用%{item}
+      continue: 继续合成
+      dismantle: 拆解并返还材料
+      dismantled: 已拆解%{item}并返还材料。
+  crafting:
+    action: 制作%{item}
+    done: 完成了%{item} ×%{count}。
+    collect_material: 收集材料
+    title: 合成配方
+    choose: 选择要制作的配方编号
+    how_many: 制作多少次？
+    entry: "%{name}"
+    empty: 你没有足够的材料来进行任何合成。
+    apply_failed: "%{recipe}合成失败。"
+    paused: 合成已暂停，并已作为物品保存；可在物品栏中使用以继续合成或拆解。
+    incorrupted: 合成终止。
+    surface_required: 此配方需要合成表面；如果配方要求坚固表面，需要先制作并放置工作台。
+    materials_changed: 到达材料处后，所需材料已不足。
+    move_failed: 无法移动至合成目标。
+  travel:
+    title: "当前位置：%{current_location} \n选择旅行坐标"
+    choose: 选择要前往的地点
+    entry: "%{name} %{angle}，%{distance}米，预计%{time}秒"
+    bookmark: 已记录坐标%{index}
+    bookmark_name: 已记录坐标%{index}
+    bookmarked: 已记录当前位置（坐标%{count}）。
+    arrived: 已抵达目的地。
+  error:
+    no_such_body_part: { name: 所需身体部位不存在，无法进行该行动。 }
+    body_part_used: { name: 所需身体部位正被其他行动占用。 }
+    item_too_heavy: { name: 物品过重，无法用手持起。 }
+    low_efficiency: { name: 你的效率过低，无法继续行动。 }
+    interrupted: { name: 行动被打断。 }
+    death: { name: 你死了。 }
+    worn_load_too_heavy: { name: 物品负重过重，无法起身或移动。 }
+    movement_blocked: { name: 地形阻挡，无法到达目的地。 }
+    move_within_range_failed: { name: 无法移动到交互范围内。 }
+    missing_recipe_materials: { name: "还缺少%{count}个合成材料。" }
+    hand_unavailable: { name: 已选择的手不再可用。 }
+    crafting_material_lost: { name: 已选中的合成材料从手中消失了。 }
+    crafting_surface_unavailable: { name: 已选中的合成表面已不可用。 }
+    crafting_surface_disappeared: { name: 返还材料时，已选中的合成表面消失了。 }
+    no_surface_for_crafting_materials:
+      { name: 没有合成表面可以存放剩余的合成材料。 }
+    crafting_material_changed:
+      { name: 移动过程中，已选中的合成材料发生了变化。 }
+    crafting_inventory_changed_on_reserve:
+      { name: 预留合成材料时，材料发生了变化。 }
+    crafting_inventory_changed_on_consume:
+      { name: 消耗合成材料时，材料发生了变化。 }
+    recipe_output_missing: { name: 配方的输出与声明的结果不符。 }
+    paused_craft_missing: { name: 已选中的暂停合成已不在物品栏中。 }
+    paused_craft_removal_failed: { name: 无法从物品栏中取出已选中的暂停合成。 }
+    not_paused_craft: { name: 所选物品不是暂停中的合成。 }
+    item_missing: { name: 已选中的物品已不在物品栏中。 }
+    item_removal_failed: { name: 无法从物品栏中取出已选中的物品。 }
+    item_lost_from_hand: { name: 已持有的物品从手中消失了。 }
+    item_not_wearable: { name: 无法穿戴不能穿戴的物品。 }
+    pickup_pile_disappeared: { name: 交互过程中，已选中的物品堆消失了。 }
+    pickup_item_changed: { name: 交互过程中，已选中的拾取物品发生了变化。 }
+    pickup_item_removal_failed: { name: 无法取出已选中的拾取物品。 }
+    pickup_item_lost: { name: 已选中的拾取物品从手中消失了。 }
+    gather_source_disappeared: { name: 交互过程中，已选中的采集资源消失了。 }
+    gather_source_changed: { name: 交互过程中，已选中的采集资源发生了变化。 }
+    gathered_item_lost: { name: 采集到的物品从手中消失了。 }
+    tree_disappeared: { name: 交互过程中，所选树木消失了。 }
+    surface_item_changed: { name: 放置前，已选中的物品发生了变化。 }
+    surface_item_take_changed: { name: 取回前，已选中的表面物品发生了变化。 }
+    surface_item_take_failed: { name: 无法取出已选中的表面物品。 }
+    workbench_removal_failed: { name: 无法取出已选中的工作台。 }
+    workbench_take_failed: { name: 无法从合成表面上取出已选中的工作台。 }
+    workbench_unavailable: { name: 已选中的工作台已不可用。 }
+    action_not_found: { name: "未找到行动“%{action}”。" }
+
+climate: { day: 白昼, night: 夜间 }
+
+weather: { clear: 晴朗, cloudy: 多云, rain: 降雨 }
+
+direction: { east: 东方, north_east: 东北方, north: 北方, north_west: 西北方, west: 西方, south_west: 西南方, south: 南方, south_east: 东南方 }
+direction.rel: { forward: 前, left_forward: 左前, left: 左, left_backward: 左后, backward: 后, right_backward: 右后, right: 右, right_forward: 右前 }
+direction.inside: 中
+
+use:
+  eat: { name: 食用, action: "吃%{item}" }
+  drink: { name: 饮用, action: "喝%{item}" }
+  consume: { name: 消耗, action: "使用%{item}" }
+  disinfect_water:
+    name: 用水消毒
+    desc: 清洁并消毒指定部位的伤口。
+    action: 用水清洁伤口（%{item}）
+  disinfect_alcohol:
+    name: 用酒精消毒
+    desc: 消毒指定部位的伤口，但会造成疼痛。
+    action: 用酒精处理伤口（%{item}）
+  cotton_strip:
+    name: 用棉布条包扎
+    desc: 用棉布条覆盖指定部位的伤口。
+    action: 用棉布条包扎伤口（%{item}）
+  bandage:
+    name: 用绷带包扎
+    desc: 用绷带包扎指定部位的伤口。
+    action: 用绷带包扎伤口（%{item}）
+
+consume_type:
+  none: 不消耗材料
+  for_each: 每次合成消耗材料
+  per_recipe: 每个配方消耗材料
+  batch_all: 批量消耗所有材料
+
+crafting.recipe: 配方
+crafting:
+  recipe:
+    step: "[%{index}] %{name} - %{inputs} -> %{outputs}（%{time}，%{activity}×活动）"
+    cotton_strip: { name: 撕制棉布条 }
+    bandage: { name: 制作绷带 }
+    alcohol: { name: 发酵浆果制酒精 }
+    dry_tree_vine: { name: 烤干树藤 }
+    vine_backpack: { name: 编织树藤背包 }
+    vine_basket: { name: 编织树藤筐 }
+    kill_freshwater_fish: { name: 处理淡水鱼 }
+    grill_freshwater_fish: { name: 烤淡水鱼 }
+    workbench: { name: 制作工作台 }
+
+unit:
+  vol: { m3: 立方米, L: 升, mL: 毫升, uL: 微升 }
+  mass: { kg: 千克, g: 克, mg: 毫克, ug: 微克 }
+  len: { km: 千米, m: 米, cm: 厘米, mm: 毫米, um: 微米 }
+  dur: { w: 周, d: 天, h: 小时, m: 分钟, s: 秒, ms: 毫秒, µs: 微秒, ns: 纳秒 }
+
+title:
+  prompt: "[Enter/空格]进入游戏  [$]选项  [q]退出"
+
+menu:
+  title: 选项
+  resume: 返回游戏
+  simulation_interval:
+    { label: "模拟间隔：%{value}", title: 模拟间隔（每次 tick 模拟的游戏时间） }
+  max_decimal_places:
+    { label: "最大小数位数：%{value}", title: 最大小数位数（0–10） }
+  language:
+    { label: "语言：%{value}", title: 语言, simplified_chinese: 简体中文 }
+  direction_display:
+    label: "方位显示：%{value}"
+    title: 方位显示
+    relative: { name: 相对方位 }
+    absolute: { name: 绝对方位 }
+    both: { name: 两者 }
+  approx_prefix: { label: "显示“约”字样：%{value}", title: 显示“约”字样 }
+
+ui:
+  approx: 约%{value}
+  get_number:
+    value: （只能为%{value}）
+    # range: （%{start}–%{last}）
+    empty: 输入为空。%{prompt}
+    invalid: 输入无效。%{prompt}
+  display_list: { empty: （空） }
+  continue_prompt: 输入任意键继续……
+
+approx_prefix: { none.name: 不显示, text.name: 约, tilde.name: "~" }

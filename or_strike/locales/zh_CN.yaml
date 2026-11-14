@@ -1,0 +1,11 @@
+ui:
+  approx: 约%{value}
+  get_number:
+    value: （只能为%{value}）
+    empty: 输入为空。%{prompt}
+    invalid: 输入无效。%{prompt}
+  display_list:
+    empty: （空）
+  choice:
+    help: "左/右、</>、-/+ 或 = 选择，Ctrl 每次 5 步；Enter 确认，Esc 取消"
+  continue_prompt: 输入任意键继续……
