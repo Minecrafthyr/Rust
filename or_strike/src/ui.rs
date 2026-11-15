@@ -26,8 +26,9 @@ fn input_cursor_position() -> (u16, u16) {
 }
 
 fn draw_input(
-  s: &mut ScreenWriter, column: u16, row: u16, input: &str, placeholder: Option<&str>,
+  s: &mut ScreenWriter, input: &str, placeholder: Option<&str>,
 ) -> Result<(), std::io::Error> {
+  let (column, row) = input_cursor_position();
   execute!(s.out, MoveTo(column, row), Clear(UntilNewLine))?;
   if input.is_empty() {
     if let Some(placeholder) = placeholder {
@@ -75,7 +76,7 @@ impl<
   where
     <T as FromStr>::Err: std::fmt::Debug,
   {
-    let mut p = format!("\n{}", self.prompt);
+    let mut p = format!("{}", self.prompt);
     if let Some(r) = &self.range {
       _ = match r.start_bound() {
       Bound::Included(v) => write!(p, "[{}", v),
@@ -91,9 +92,8 @@ impl<
     }
     write!(p, "：").unwrap();
     s.writeln(&p)?.end()?;
-    let (mut input_column, mut input_row) = input_cursor_position();
     let placeholder = self.default.map(|default| default.to_string());
-    draw_input(s, input_column, input_row, "", placeholder.as_deref())?;
+    draw_input(s, "", placeholder.as_deref())?;
 
     let mut buf = String::new();
     loop {
@@ -110,11 +110,11 @@ impl<
         } else {
           buf.push(ch);
         }
-        draw_input(s, input_column, input_row, &buf, placeholder.as_deref())?;
+        draw_input(s, &buf, placeholder.as_deref())?;
       }
       Backspace => {
         buf.pop();
-        draw_input(s, input_column, input_row, &buf, placeholder.as_deref())?;
+        draw_input(s, &buf, placeholder.as_deref())?;
       }
       Enter => {
         let number = if buf.is_empty() {
@@ -122,16 +122,14 @@ impl<
             v
           } else {
             s.endl()?.writeln(t!("ui.get_number.empty", prompt = p))?.flush()?;
-            (input_column, input_row) = input_cursor_position();
-            draw_input(s, input_column, input_row, &buf, placeholder.as_deref())?;
+            draw_input(s, &buf, placeholder.as_deref())?;
             continue;
           }
         } else {
           let Ok(number) = buf.parse() else {
             s.endl()?.writeln(t!("ui.get_number.invalid", prompt = p))?.flush()?;
             buf.clear();
-            (input_column, input_row) = input_cursor_position();
-            draw_input(s, input_column, input_row, &buf, placeholder.as_deref())?;
+            draw_input(s, &buf, placeholder.as_deref())?;
             continue;
           };
           number
@@ -139,8 +137,7 @@ impl<
         if self.range.as_ref().map(|r| !r.contains(&number)).unwrap_or(false) {
           s.endl()?.writeln(t!("ui.get_number.invalid", prompt = p))?.flush()?;
           buf.clear();
-          (input_column, input_row) = input_cursor_position();
-          draw_input(s, input_column, input_row, &buf, placeholder.as_deref())?;
+          draw_input(s, &buf, placeholder.as_deref())?;
           continue;
         }
         if let Some(c) = self.check
@@ -148,8 +145,7 @@ impl<
         {
           s.endl()?.write(f)?.write(&p)?.endl()?.flush()?;
           buf.clear();
-          (input_column, input_row) = input_cursor_position();
-          draw_input(s, input_column, input_row, &buf, placeholder.as_deref())?;
+          draw_input(s, &buf, placeholder.as_deref())?;
           continue;
         }
         return Ok(Some(number));
@@ -177,12 +173,10 @@ impl<'a, PromptT: Display> StringRequester<'a, PromptT> {
   }
 
   fn request_visible(self, s: &mut ScreenWriter) -> Result<Option<String>, std::io::Error> {
-    let mut prompt = format!("\n{}", self.prompt);
-    write!(prompt, "：").unwrap();
-    s.writeln(&prompt)?.end()?;
-    let (mut input_column, mut input_row) = input_cursor_position();
+    writeln!(s, "{}：", self.prompt)?;
+    s.end()?;
     let placeholder = self.default.as_deref();
-    draw_input(s, input_column, input_row, "", placeholder)?;
+    draw_input(s, "", placeholder)?;
 
     let mut buf = String::new();
     loop {
@@ -194,20 +188,20 @@ impl<'a, PromptT: Display> StringRequester<'a, PromptT> {
       Esc => return Ok(None),
       Char(ch) if !ch.is_control() => {
         buf.push(ch);
-        draw_input(s, input_column, input_row, &buf, placeholder)?;
+        draw_input(s, &buf, placeholder)?;
       }
       Backspace =>
         if buf.pop().is_some() {
-          draw_input(s, input_column, input_row, &buf, placeholder)?;
+          draw_input(s, &buf, placeholder)?;
         },
       Enter => {
         let value =
           if buf.is_empty() { self.default.clone().unwrap_or_default() } else { buf.clone() };
         if let Some(message) = self.check.and_then(|check| check(&value)) {
-          s.endl()?.writeln(message)?.write(&prompt)?.endl()?.flush()?;
+          writeln!(s, "\n{message}\n{}：", self.prompt)?;
+          s.flush()?;
           buf.clear();
-          (input_column, input_row) = input_cursor_position();
-          draw_input(s, input_column, input_row, &buf, placeholder)?;
+          draw_input(s, &buf, placeholder)?;
           continue;
         }
         return Ok(Some(value));

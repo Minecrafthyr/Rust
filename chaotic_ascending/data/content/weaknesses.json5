@@ -1,0 +1,190 @@
+// 混乱擢升 · 怪物弱点报告
+//
+// source: network / research / combat / dissection
+// 网络公告、研究设施数据库、反复攻击与解剖分别能揭示不同来源的弱点。
+{
+  "weaknesses": [
+    {
+      "id": "zombie_fire",
+      "creature": "zombie",
+      "name": "怕火",
+      "source": "network",
+      "desc": "火焰会点燃干枯组织，持续伤害并拖慢行动。燃烧瓶和火把都有效。"
+    },
+    {
+      "id": "zombie_light",
+      "creature": "zombie",
+      "name": "怕强光",
+      "source": "network",
+      "desc": "强光会破坏感光组织，让丧尸短暂失去方向。"
+    },
+    {
+      "id": "zombie_brain",
+      "creature": "zombie",
+      "name": "脑部结构",
+      "source": "dissection",
+      "desc": "破坏脑干可以立刻终止行动，其他部位的伤害只是拖慢它。"
+    },
+    {
+      "id": "zombie_leader_fire",
+      "creature": "zombie_leader",
+      "name": "怕火",
+      "source": "network",
+      "desc": "首领对火焰同样敏感，火会打断它聚集尸群的命令。"
+    },
+    {
+      "id": "zombie_leader_command",
+      "creature": "zombie_leader",
+      "name": "依赖命令",
+      "source": "combat",
+      "desc": "连续攻击打断它的吼叫，周围的丧尸会短暂失去协同。"
+    },
+    {
+      "id": "zombie_tyrant_joint",
+      "creature": "zombie_tyrant",
+      "name": "膝关节",
+      "source": "combat",
+      "desc": "沉重的身体压在变形的膝关节上，集中攻击那里能让它跪倒。"
+    },
+    {
+      "id": "slime_fire",
+      "creature": "slime",
+      "name": "怕火",
+      "source": "network",
+      "desc": "高温会让黏液迅速失水收缩。"
+    },
+    {
+      "id": "slime_dehydrate",
+      "creature": "slime",
+      "name": "脱水",
+      "source": "dissection",
+      "desc": "黏液的外膜无法阻止盐分渗入，撒盐会让它分裂得更慢。"
+    },
+    {
+      "id": "tentacle_cut",
+      "creature": "tentacle",
+      "name": "吸盘根部",
+      "source": "combat",
+      "desc": "吸盘与主干连接处最脆弱，连续劈砍可以卸掉一条触手。"
+    },
+    {
+      "id": "tentacle_light",
+      "creature": "tentacle",
+      "name": "畏光",
+      "source": "research",
+      "desc": "强光会令触手短暂蜷缩，露出没有保护的核心。"
+    },
+    {
+      "id": "vine_root",
+      "creature": "vine",
+      "name": "主根",
+      "source": "combat",
+      "desc": "藤蔓的本体在主根，切断主根比砍藤条有效。"
+    },
+    {
+      "id": "thorn_fire",
+      "creature": "thorn_vine",
+      "name": "怕火",
+      "source": "research",
+      "desc": "荆棘的木质部含油，火势会沿着藤蔓迅速蔓延。"
+    },
+    {
+      "id": "ghost_light",
+      "creature": "ghost",
+      "name": "强光",
+      "source": "research",
+      "desc": "残念在强光下会变得稀薄，攻击难以命中，但更容易被驱散。"
+    },
+    {
+      "id": "soul_zombie_salt",
+      "creature": "soul_zombie",
+      "name": "盐与铁",
+      "source": "research",
+      "desc": "盐能暂时封住魂尸的伤口，铁器则能打断它的意识。"
+    },
+    {
+      "id": "flesh_mass_core",
+      "creature": "flesh_mass",
+      "name": "核心",
+      "source": "combat",
+      "desc": "血肉团块有一个跳动的核心，其他部分只是可替换的肉。"
+    },
+    {
+      "id": "distortion_anchor",
+      "creature": "distortion_avatar",
+      "name": "稳定锚点",
+      "source": "research",
+      "desc": "扭曲化身需要一个现实锚点维持形态，破坏锚点能让它短暂消散。"
+    },
+    {
+      "id": "distortion_focus",
+      "creature": "distortion_avatar",
+      "name": "集中火力",
+      "source": "combat",
+      "desc": "分散攻击只会让它折叠空间；短时间内的集中伤害才能撕开缺口。"
+    },
+    {
+      "id": "void_hound_light",
+      "creature": "void_hound",
+      "name": "强光",
+      "source": "dissection",
+      "desc": "虚空猎犬的感光器官退化，强光会让它失去空间感。"
+    },
+    {
+      "id": "reality_bloom_root",
+      "creature": "reality_bloom",
+      "name": "根系",
+      "source": "combat",
+      "desc": "现实之花靠根系固定周围的法则，切断根系才能让它枯萎。"
+    },
+    {
+      "id": "mage_lord_counter",
+      "creature": "mage_lord",
+      "name": "施法反制",
+      "source": "research",
+      "desc": "法主在吟唱结束前有明显的停顿，抓住停顿打断可以反制法术。"
+    },
+    {
+      "id": "mage_raider_melee",
+      "creature": "mage_raider",
+      "name": "近身",
+      "source": "combat",
+      "desc": "法徒不擅长近战，贴身攻击能让他来不及施法。"
+    },
+    {
+      "id": "psychic_hunter_blind",
+      "creature": "psychic_hunter",
+      "name": "感知过载",
+      "source": "combat",
+      "desc": "灵猎手依赖感知追踪目标，突然的强光和噪音会让他短暂失去目标。"
+    },
+    {
+      "id": "infected_deer_leg",
+      "creature": "infected_deer",
+      "name": "后腿",
+      "source": "combat",
+      "desc": "感染鹿的冲撞依赖后腿，攻击后腿能废掉它的突进。"
+    },
+    {
+      "id": "two_head_crow_eyes",
+      "creature": "two_head_crow",
+      "name": "双眼",
+      "source": "dissection",
+      "desc": "两个头共享一套视觉，遮住或破坏眼睛会让它撞上障碍。"
+    },
+    {
+      "id": "glow_moss_dark",
+      "creature": "glow_moss",
+      "name": "畏暗",
+      "source": "dissection",
+      "desc": "荧光苔靠光生存，切断光源会让它迅速失去活性。"
+    },
+    {
+      "id": "slime_king_fire",
+      "creature": "slime_king",
+      "name": "怕火",
+      "source": "network",
+      "desc": "黏液之王同样怕火，高温会让它的体积迅速缩小。"
+    }
+  ]
+}

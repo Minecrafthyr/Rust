@@ -1,1 +1,7 @@
 /target
+/data/config.json5
+/data/archive.bin
+/data/cache/
+/data/content.tmp/
+/data/worlds/
+/.dsh

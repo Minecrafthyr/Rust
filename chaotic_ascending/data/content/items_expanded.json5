@@ -1,0 +1,527 @@
+// 混乱擢升 · 生活物资扩充
+//
+// 第一、二天的城市与乡村尚未失序，货架和住家里仍有大量真实品类的物资。
+{
+  "items": [
+    {
+      "id": "bread",
+      "name": "面包",
+      "kind": "food",
+      "phase": 1,
+      "power": 24,
+      "desc": "超市当天出炉的面包，包装袋上还印着保质期。"
+    },
+    {
+      "id": "milk",
+      "name": "牛奶",
+      "kind": "water",
+      "phase": 1,
+      "power": 20,
+      "desc": "一升装纸盒牛奶，冷藏柜断电前还是凉的。"
+    },
+    {
+      "id": "rice",
+      "name": "大米",
+      "kind": "food",
+      "phase": 1,
+      "power": 40,
+      "desc": "五公斤装的大米，足够吃上许多天。"
+    },
+    {
+      "id": "noodles",
+      "name": "挂面",
+      "kind": "food",
+      "phase": 1,
+      "power": 34,
+      "desc": "干燥的挂面，煮起来需要水和火。"
+    },
+    {
+      "id": "instant_noodles",
+      "name": "方便面",
+      "kind": "food",
+      "phase": 1,
+      "power": 28,
+      "desc": "调料包齐全，是超市货架上最容易被抢走的东西。"
+    },
+    {
+      "id": "biscuits",
+      "name": "饼干",
+      "kind": "food",
+      "phase": 1,
+      "power": 18,
+      "desc": "铁盒饼干，打开时发出很响的声音。"
+    },
+    {
+      "id": "chocolate",
+      "name": "巧克力",
+      "kind": "food",
+      "phase": 1,
+      "power": 20,
+      "desc": "高热量，适合塞进口袋。"
+    },
+    {
+      "id": "canned_meat",
+      "name": "午餐肉罐头",
+      "kind": "food",
+      "phase": 1,
+      "power": 38,
+      "desc": "油浸的肉罐头，标签上印着一家老厂的名字。"
+    },
+    {
+      "id": "peanut_butter",
+      "name": "花生酱",
+      "kind": "food",
+      "phase": 1,
+      "power": 30,
+      "desc": "一大罐花生酱，能量密度很高。"
+    },
+    {
+      "id": "cereal",
+      "name": "麦片",
+      "kind": "food",
+      "phase": 1,
+      "power": 26,
+      "desc": "早餐麦片，干吃也能填饱肚子。"
+    },
+    {
+      "id": "fruit",
+      "name": "苹果",
+      "kind": "food",
+      "phase": 1,
+      "power": 14,
+      "desc": "几颗还能吃的苹果，表皮有些磕碰。"
+    },
+    {
+      "id": "vegetables",
+      "name": "蔬菜",
+      "kind": "food",
+      "phase": 1,
+      "power": 16,
+      "desc": "一把带着泥土的时令蔬菜。"
+    },
+    {
+      "id": "baby_formula",
+      "name": "婴儿奶粉",
+      "kind": "food",
+      "phase": 1,
+      "power": 34,
+      "desc": "货架最里侧留下的婴儿奶粉，罐身写着适用年龄。"
+    },
+    {
+      "id": "pet_food",
+      "name": "宠物粮",
+      "kind": "food",
+      "phase": 1,
+      "power": 15,
+      "desc": "不太适合人吃，但总比空腹好。"
+    },
+    {
+      "id": "soda",
+      "name": "汽水",
+      "kind": "water",
+      "phase": 1,
+      "power": 18,
+      "desc": "糖分很高的碳酸饮料。"
+    },
+    {
+      "id": "juice",
+      "name": "果汁",
+      "kind": "water",
+      "phase": 1,
+      "power": 22,
+      "desc": "纸盒果汁，吸管还粘在侧面。"
+    },
+    {
+      "id": "energy_drink",
+      "name": "功能饮料",
+      "kind": "water",
+      "phase": 1,
+      "power": 26,
+      "desc": "咖啡因和糖，能短暂压住疲倦。"
+    },
+    {
+      "id": "cold_medicine",
+      "name": "感冒药",
+      "kind": "medicine",
+      "phase": 1,
+      "power": 16,
+      "desc": "普通感冒药，不能治伤，但能让人好受一点。"
+    },
+    {
+      "id": "disinfectant",
+      "name": "消毒酒精",
+      "kind": "medicine",
+      "phase": 1,
+      "power": 12,
+      "desc": "医用酒精，可以清理伤口，也可以点燃。"
+    },
+    {
+      "id": "vitamins",
+      "name": "维生素",
+      "kind": "medicine",
+      "phase": 1,
+      "power": 8,
+      "desc": "一瓶复合维生素，聊胜于无。"
+    },
+    {
+      "id": "baseball_bat",
+      "name": "棒球棍",
+      "kind": "weapon",
+      "phase": 1,
+      "power": 4,
+      "desc": "学校体育器材室里常见的木制球棍。"
+    },
+    {
+      "id": "crowbar",
+      "name": "撬棍",
+      "kind": "weapon",
+      "phase": 1,
+      "power": 5,
+      "desc": "五金店里的撬棍，能撬门，也能防身。"
+    },
+    {
+      "id": "fire_axe",
+      "name": "消防斧",
+      "kind": "weapon",
+      "phase": 1,
+      "power": 8,
+      "desc": "挂在消防栓旁的红漆斧头，刃口已经钝了。"
+    },
+    {
+      "id": "scissors",
+      "name": "剪刀",
+      "kind": "weapon",
+      "phase": 1,
+      "power": 2,
+      "desc": "学校手工课用的剪刀，尖端并不锋利。"
+    },
+    {
+      "id": "kitchen_cleaver",
+      "name": "菜刀",
+      "kind": "weapon",
+      "phase": 1,
+      "power": 6,
+      "desc": "厨房里最沉的菜刀，刀背很厚。"
+    },
+    {
+      "id": "molotov",
+      "name": "燃烧瓶",
+      "kind": "weapon",
+      "phase": 1,
+      "power": 9,
+      "desc": "用酒瓶和布条临时做成的燃烧瓶。丧尸怕火，这东西很有用。"
+    },
+    {
+      "id": "winter_coat",
+      "name": "羽绒服",
+      "kind": "armor",
+      "phase": 1,
+      "power": 3,
+      "desc": "厚实的冬衣，能挡风，也能挡住一部分抓挠。"
+    },
+    {
+      "id": "work_gloves",
+      "name": "工作手套",
+      "kind": "armor",
+      "phase": 1,
+      "power": 1,
+      "desc": "厚胶手套，能防止被碎玻璃和牙齿划伤。"
+    },
+    {
+      "id": "raincoat",
+      "name": "雨衣",
+      "kind": "armor",
+      "phase": 1,
+      "power": 1,
+      "desc": "薄塑料雨衣，至少能挡住体液。"
+    },
+    {
+      "id": "helmet",
+      "name": "安全帽",
+      "kind": "armor",
+      "phase": 1,
+      "power": 2,
+      "desc": "工地上常见的黄色安全帽。"
+    },
+    {
+      "id": "laptop",
+      "name": "笔记本电脑",
+      "kind": "device",
+      "phase": 1,
+      "power": 0,
+      "desc": "还有电的笔记本电脑，也许能接入某些网络。"
+    },
+    {
+      "id": "powerbank",
+      "name": "充电宝",
+      "kind": "device",
+      "phase": 1,
+      "power": 0,
+      "desc": "满电的充电宝，能让手机多撑一阵。"
+    },
+    {
+      "id": "camera",
+      "name": "数码相机",
+      "kind": "device",
+      "phase": 1,
+      "power": 0,
+      "desc": "一台旧相机，可以拍下痕迹和文件。"
+    },
+    {
+      "id": "calculator",
+      "name": "计算器",
+      "kind": "device",
+      "phase": 1,
+      "power": 0,
+      "desc": "学校用的科学计算器。"
+    },
+    {
+      "id": "usb_drive",
+      "name": "U盘",
+      "kind": "device",
+      "phase": 1,
+      "power": 0,
+      "desc": "不知道里面存了什么，接口还很干净。"
+    },
+    {
+      "id": "lighter",
+      "name": "打火机",
+      "kind": "device",
+      "phase": 1,
+      "power": 0,
+      "desc": "便利店收银台旁的打火机，随时能点着火。"
+    },
+    {
+      "id": "matches",
+      "name": "火柴",
+      "kind": "device",
+      "phase": 1,
+      "power": 0,
+      "desc": "一盒干燥的火柴。"
+    },
+    {
+      "id": "candle",
+      "name": "蜡烛",
+      "kind": "device",
+      "phase": 1,
+      "power": 0,
+      "desc": "停电时最有用的东西之一。"
+    },
+    {
+      "id": "school_bag",
+      "name": "书包",
+      "kind": "material",
+      "phase": 1,
+      "power": 0,
+      "desc": "印着校徽的双肩包，里面还塞着几张试卷。"
+    },
+    {
+      "id": "notebook",
+      "name": "笔记本",
+      "kind": "material",
+      "phase": 1,
+      "power": 0,
+      "desc": "没写完的横线本，可以记录情报。"
+    },
+    {
+      "id": "pen",
+      "name": "圆珠笔",
+      "kind": "material",
+      "phase": 1,
+      "power": 0,
+      "desc": "一支还能写字的圆珠笔。"
+    },
+    {
+      "id": "textbook",
+      "name": "教科书",
+      "kind": "material",
+      "phase": 1,
+      "power": 0,
+      "desc": "一本被翻旧的地理教科书。"
+    },
+    {
+      "id": "chalk",
+      "name": "粉笔",
+      "kind": "material",
+      "phase": 1,
+      "power": 0,
+      "desc": "一盒白色粉笔，可以在墙上做标记。"
+    },
+    {
+      "id": "glue",
+      "name": "胶水",
+      "kind": "material",
+      "phase": 1,
+      "power": 0,
+      "desc": "手工课用的强力胶。"
+    },
+    {
+      "id": "rope",
+      "name": "绳子",
+      "kind": "material",
+      "phase": 1,
+      "power": 0,
+      "desc": "十米长的尼龙绳，承重不错。"
+    },
+    {
+      "id": "tarp",
+      "name": "防水布",
+      "kind": "material",
+      "phase": 1,
+      "power": 0,
+      "desc": "一大块折叠的防水布，能搭临时棚子。"
+    },
+    {
+      "id": "fuel",
+      "name": "燃料",
+      "kind": "material",
+      "phase": 1,
+      "power": 0,
+      "desc": "装在塑料桶里的汽油，气味很冲。"
+    },
+    {
+      "id": "cleaning_supplies",
+      "name": "清洁剂",
+      "kind": "material",
+      "phase": 1,
+      "power": 0,
+      "desc": "超市清洁区的去污剂和漂白水。"
+    },
+    {
+      "id": "towel",
+      "name": "毛巾",
+      "kind": "material",
+      "phase": 1,
+      "power": 0,
+      "desc": "一条干燥的棉毛巾。"
+    },
+    {
+      "id": "soap",
+      "name": "肥皂",
+      "kind": "material",
+      "phase": 1,
+      "power": 0,
+      "desc": "最普通的肥皂，能洗掉血迹。"
+    },
+    {
+      "id": "spare_clothes",
+      "name": "换洗衣物",
+      "kind": "material",
+      "phase": 1,
+      "power": 0,
+      "desc": "一套干净的衣服，尺码不一定合适。"
+    },
+    {
+      "id": "sleeping_bag",
+      "name": "睡袋",
+      "kind": "device",
+      "phase": 1,
+      "power": 0,
+      "desc": "户外用品区的睡袋，能让人在冷夜里睡得好一点。"
+    },
+    {
+      "id": "umbrella",
+      "name": "雨伞",
+      "kind": "device",
+      "phase": 1,
+      "power": 0,
+      "desc": "一把结实的黑色长柄伞。"
+    },
+    {
+      "id": "cookware",
+      "name": "锅具",
+      "kind": "material",
+      "phase": 1,
+      "power": 0,
+      "desc": "一口带盖的汤锅，可以烧水和煮面。"
+    },
+    {
+      "id": "toolbox",
+      "name": "工具箱",
+      "kind": "material",
+      "phase": 1,
+      "power": 0,
+      "desc": "锤子、扳手和螺丝刀装了一整箱。"
+    },
+    {
+      "id": "sports_ball",
+      "name": "篮球",
+      "kind": "material",
+      "phase": 1,
+      "power": 0,
+      "desc": "学校体育馆里的篮球，弹性还在。"
+    },
+    {
+      "id": "microscope",
+      "name": "显微镜",
+      "kind": "device",
+      "phase": 1,
+      "power": 0,
+      "desc": "生物实验室的旧显微镜，也许能用来观察样本。"
+    },
+    {
+      "id": "chemicals",
+      "name": "化学试剂",
+      "kind": "material",
+      "phase": 1,
+      "power": 0,
+      "desc": "贴着危险标识的试剂瓶，用途不明。"
+    },
+    {
+      "id": "art_supplies",
+      "name": "美术用品",
+      "kind": "material",
+      "phase": 1,
+      "power": 0,
+      "desc": "颜料、画笔和一大卷画纸。"
+    },
+    {
+      "id": "school_uniform",
+      "name": "校服",
+      "kind": "armor",
+      "phase": 1,
+      "power": 1,
+      "desc": "洗得发白的校服外套，至少能挡一点风。"
+    },
+    {
+      "id": "whistle",
+      "name": "哨子",
+      "kind": "device",
+      "phase": 1,
+      "power": 0,
+      "desc": "体育老师的哨子，吹响时能传出很远。"
+    },
+    {
+      "id": "research_id_card",
+      "name": "研究设施身份卡",
+      "kind": "key",
+      "phase": 1,
+      "power": 0,
+      "desc": "碧落研究园区的员工身份卡，上面有红色的条纹和门禁等级。"
+    },
+    {
+      "id": "database_password",
+      "name": "数据库密码",
+      "kind": "key",
+      "phase": 1,
+      "power": 0,
+      "desc": "写着研究设施数据库密码的纸条，能和身份卡一起打开终端。"
+    },
+    {
+      "id": "storage_key",
+      "name": "储物柜钥匙",
+      "kind": "key",
+      "phase": 1,
+      "power": 0,
+      "desc": "一把贴着编号的储物柜钥匙。"
+    },
+    {
+      "id": "vehicle_key",
+      "name": "车钥匙",
+      "kind": "key",
+      "phase": 1,
+      "power": 0,
+      "desc": "一把旧车钥匙，车可能还停在附近。"
+    }
+  ]
+}

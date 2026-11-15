@@ -1,0 +1,417 @@
+// 混乱擢升 · 物品定义
+//
+// kind：food / water / medicine / herb / vaccine / weapon / armor / device / material / key。
+{
+  "items": [
+    {
+      "desc": "标签已经褪色，但密封仍然完好。",
+      "id": "canned_food",
+      "kind": "food",
+      "name": "罐头",
+      "phase": 1,
+      "power": 30
+    },
+    {
+      "desc": "高热量、口感糟糕，适合塞进背包。",
+      "id": "energy_bar",
+      "kind": "food",
+      "name": "能量棒",
+      "phase": 1,
+      "power": 22
+    },
+    {
+      "desc": "军队留下的压缩口粮，足以支撑一段长路。",
+      "id": "field_ration",
+      "kind": "food",
+      "name": "军用口粮",
+      "phase": 2,
+      "power": 42
+    },
+    {
+      "desc": "普通塑料瓶，瓶身已经有些变形。",
+      "id": "water_bottle",
+      "kind": "water",
+      "name": "瓶装水",
+      "phase": 1,
+      "power": 32
+    },
+    {
+      "desc": "经过简易过滤的水，没有异味。",
+      "id": "purified_water",
+      "kind": "water",
+      "name": "净化水",
+      "phase": 2,
+      "power": 46
+    },
+    {
+      "desc": "纱布、碘伏和几片止痛药。",
+      "id": "first_aid",
+      "kind": "medicine",
+      "name": "急救包",
+      "phase": 1,
+      "power": 35
+    },
+    {
+      "desc": "只能压住疼痛，不能治好伤口。",
+      "id": "painkiller",
+      "kind": "medicine",
+      "name": "止痛药",
+      "phase": 1,
+      "power": 18
+    },
+    {
+      "desc": "干净程度存疑，但总比什么都没有好。",
+      "id": "bandage",
+      "kind": "medicine",
+      "name": "绷带",
+      "phase": 1,
+      "power": 14
+    },
+    {
+      "desc": "叶片带一点微光，咀嚼后伤口会慢慢收拢。",
+      "id": "herb",
+      "kind": "herb",
+      "name": "药草",
+      "phase": 2,
+      "power": 18
+    },
+    {
+      "desc": "在扭曲值高的地方生长，药性更烈，也更容易让人产生幻觉。",
+      "id": "mutant_herb",
+      "kind": "herb",
+      "name": "变异药草",
+      "phase": 2,
+      "power": 28
+    },
+    {
+      "desc": "官方赶制的疫苗，能显著降低感染程度；不能治愈已经完成的转化。",
+      "id": "zombie_vaccine",
+      "kind": "vaccine",
+      "name": "丧尸病毒疫苗",
+      "phase": 2,
+      "power": 55
+    },
+    {
+      "desc": "从废弃管道上拆下来的铁管，沉重而可靠。",
+      "id": "pipe",
+      "kind": "weapon",
+      "name": "铁管",
+      "phase": 1,
+      "power": 3
+    },
+    {
+      "desc": "刀刃很薄，但近距离足够致命。",
+      "id": "knife",
+      "kind": "weapon",
+      "name": "厨房刀",
+      "phase": 1,
+      "power": 5
+    },
+    {
+      "desc": "枪膛里还剩几发子弹，声音会引来更多东西。",
+      "id": "pistol",
+      "kind": "weapon",
+      "name": "手枪",
+      "phase": 1,
+      "power": 10
+    },
+    {
+      "desc": "电量不足，但放电时仍能让人或怪物短暂僵直。",
+      "id": "stun_baton",
+      "kind": "weapon",
+      "name": "电击棍",
+      "phase": 2,
+      "power": 12
+    },
+    {
+      "desc": "乡村常见的猎枪，弹药需要节省。",
+      "id": "hunting_rifle",
+      "kind": "weapon",
+      "name": "猎枪",
+      "phase": 2,
+      "power": 14
+    },
+    {
+      "desc": "黑色刀刃几乎不反光，握柄上还缠着原主人的布条。",
+      "id": "military_blade",
+      "kind": "weapon",
+      "name": "军用短刃",
+      "phase": 3,
+      "power": 18
+    },
+    {
+      "desc": "普通衣物，能挡住抓挠，挡不住牙齿。",
+      "id": "jacket",
+      "kind": "armor",
+      "name": "厚夹克",
+      "phase": 1,
+      "power": 2
+    },
+    {
+      "desc": "从警察局找到的背心，对钝击和撕咬都有帮助。",
+      "id": "kevlar_vest",
+      "kind": "armor",
+      "name": "防弹背心",
+      "phase": 2,
+      "power": 6
+    },
+    {
+      "desc": "能减少体液接触，但在高温下会让人迅速疲劳。",
+      "id": "hazmat_suit",
+      "kind": "armor",
+      "name": "防护服",
+      "phase": 2,
+      "power": 4
+    },
+    {
+      "desc": "沉重的护甲，行动会变慢，但能正面承受大多数攻击。",
+      "id": "riot_armor",
+      "kind": "armor",
+      "name": "防暴护甲",
+      "phase": 3,
+      "power": 10
+    },
+    {
+      "desc": "还能开机。网络时有时无，偶尔能收到官方广播。",
+      "id": "phone",
+      "kind": "device",
+      "name": "智能手机",
+      "phase": 1,
+      "power": 0
+    },
+    {
+      "desc": "里面存着大量离线资料，可用于辨认怪物与药草。",
+      "id": "tablet",
+      "kind": "device",
+      "name": "平板电脑",
+      "phase": 1,
+      "power": 0
+    },
+    {
+      "desc": "磁场开始异常，但指针仍大致指向北方。",
+      "id": "compass",
+      "kind": "device",
+      "name": "指南针",
+      "phase": 1,
+      "power": 0
+    },
+    {
+      "desc": "研究设施制造的仪器，可以感知附近的灵能波动。",
+      "id": "psychic_detector",
+      "kind": "device",
+      "name": "灵能探测仪",
+      "phase": 2,
+      "power": 0
+    },
+    {
+      "desc": "读数经常跳动，至少证明法并不只是幻觉。",
+      "id": "magic_detector",
+      "kind": "device",
+      "name": "法术探测仪",
+      "phase": 2,
+      "power": 0
+    },
+    {
+      "desc": "卡片背面写着「碧落计划」。",
+      "id": "lab_keycard",
+      "kind": "key",
+      "name": "实验室门禁卡",
+      "phase": 2,
+      "power": 0
+    },
+    {
+      "desc": "可以加工成简易工具，也可以用来换东西。",
+      "id": "scrap",
+      "kind": "material",
+      "name": "废铁",
+      "phase": 1,
+      "power": 0
+    },
+    {
+      "desc": "带着牙印的骨头，可以用来磨制尖锐工具。",
+      "id": "animal_bone",
+      "kind": "material",
+      "name": "兽骨",
+      "phase": 1,
+      "power": 0
+    },
+    {
+      "desc": "仍需小心处理，组织里可能残留病毒。",
+      "id": "zombie_tissue",
+      "kind": "material",
+      "name": "丧尸组织",
+      "phase": 2,
+      "power": 0
+    },
+    {
+      "desc": "半透明的胶质，会在容器里缓慢蠕动。",
+      "id": "slime_sample",
+      "kind": "material",
+      "name": "黏液样本",
+      "phase": 2,
+      "power": 0
+    },
+    {
+      "desc": "晒干后可以编成绳索，也能作为简易武器。",
+      "id": "vine_fiber",
+      "kind": "material",
+      "name": "坚韧藤材",
+      "phase": 2,
+      "power": 0
+    },
+    {
+      "desc": "离开母体后仍会收缩，触感令人不适。",
+      "id": "tentacle_sucker",
+      "kind": "material",
+      "name": "触手吸盘",
+      "phase": 2,
+      "power": 0
+    },
+    {
+      "desc": "分泌着未知激素，是研究扭曲生物的关键材料。",
+      "id": "mutated_gland",
+      "kind": "material",
+      "name": "变异腺体",
+      "phase": 2,
+      "power": 0
+    },
+    {
+      "desc": "损坏的存储盘，仍可读出部分实验记录。",
+      "id": "lab_data",
+      "kind": "material",
+      "name": "研究数据",
+      "phase": 2,
+      "power": 0
+    },
+    {
+      "desc": "从有魂生物身上留下的一点点意识残渣，触碰时会听见低语。",
+      "id": "soul_dust",
+      "kind": "material",
+      "name": "魂屑",
+      "phase": 3,
+      "power": 0
+    },
+    {
+      "desc": "魂魄消散后留下的冷意，装在瓶子里会结霜。",
+      "id": "ghost_essence",
+      "kind": "material",
+      "name": "残念",
+      "phase": 3,
+      "power": 0
+    },
+    {
+      "desc": "现实被反复折叠后剩下的结晶体，靠近它时方向感会变差。",
+      "id": "distortion_crystal",
+      "kind": "material",
+      "name": "扭曲结晶",
+      "phase": 3,
+      "power": 0
+    },
+    {
+      "id": "battery",
+      "name": "电池",
+      "kind": "material",
+      "phase": 1,
+      "power": 0,
+      "desc": "几节还能用的干电池。"
+    },
+    {
+      "id": "flashlight",
+      "name": "手电筒",
+      "kind": "device",
+      "phase": 1,
+      "power": 0,
+      "desc": "光线不强，但能照清脚下的路。"
+    },
+    {
+      "id": "hand_radio",
+      "name": "手摇收音机",
+      "kind": "device",
+      "phase": 1,
+      "power": 0,
+      "desc": "转动摇柄就能接收官方广播和杂音。"
+    },
+    {
+      "id": "coffee",
+      "name": "速溶咖啡",
+      "kind": "food",
+      "phase": 1,
+      "power": 14,
+      "desc": "苦得发涩，但能让人清醒一阵。"
+    },
+    {
+      "id": "candy",
+      "name": "糖果",
+      "kind": "food",
+      "phase": 1,
+      "power": 10,
+      "desc": "包装纸已经发黏，糖分仍然有效。"
+    },
+    {
+      "id": "duct_tape",
+      "name": "胶带",
+      "kind": "material",
+      "phase": 1,
+      "power": 0,
+      "desc": "万能修补材料，撕开时声音很大。"
+    },
+    {
+      "id": "screwdriver",
+      "name": "螺丝刀",
+      "kind": "weapon",
+      "phase": 1,
+      "power": 4,
+      "desc": "短小、顺手，也能撬开一些面板。"
+    },
+    {
+      "id": "mutant_spore",
+      "name": "变异孢子",
+      "kind": "material",
+      "phase": 3,
+      "power": 0,
+      "desc": "仍在缓慢萌发的孢子团，靠近时能听见极轻的窸窣声。"
+    },
+    {
+      "id": "chitin_plate",
+      "name": "变异甲壳",
+      "kind": "material",
+      "phase": 3,
+      "power": 0,
+      "desc": "从小型变异动物身上剥下的甲片，轻而韧，可用于制作护具。"
+    },
+    {
+      "id": "free_magic",
+      "name": "游离之法",
+      "kind": "material",
+      "phase": 4,
+      "power": 0,
+      "desc": "从空气中凝出的法，装在容器里仍会自行流动，是制作法器的原料。"
+    },
+    {
+      "id": "magic_staff",
+      "name": "白蜡法杖",
+      "kind": "weapon",
+      "phase": 4,
+      "power": 16,
+      "magic_bonus": 10,
+      "desc": "杖身刻着反复修改的符文，握久了掌心会发烫。"
+    },
+    {
+      "id": "ritual_staff",
+      "name": "扭曲仪式杖",
+      "kind": "weapon",
+      "phase": 4,
+      "power": 22,
+      "magic_bonus": 16,
+      "desc": "由扭曲结晶和兽骨拼成，施法时会把使用者的声音拉长成回声。"
+    },
+    {
+      "id": "spell_focus",
+      "name": "聚法晶体",
+      "kind": "device",
+      "phase": 4,
+      "power": 0,
+      "desc": "悬在黄铜支架里的晶体，能让附近的游离之法向它靠拢。"
+    }
+  ]
+}

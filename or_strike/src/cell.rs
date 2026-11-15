@@ -1,8 +1,6 @@
-use std::{
-  cell::UnsafeCell,
-  ops::{Deref, DerefMut},
-  rc::{Rc, Weak},
-};
+use std::cell::UnsafeCell;
+use std::ops::{Deref, DerefMut};
+use std::rc::{Rc, Weak};
 
 #[derive(Clone)]
 pub struct RcCell<T>(Rc<UnsafeCell<T>>);

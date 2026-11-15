@@ -1,0 +1,245 @@
+// 混乱擢升 · NPC 定义
+//
+// 玩家在探索、移动或社交中遇到他们；档案里会记录属性、关系和听来的情报。
+{
+  "npcs": [
+    {
+      "id": "old_liu",
+      "name": "老刘",
+      "role": "拾荒者",
+      "faction": "无",
+      "phase": 1,
+      "desc": "五十岁上下的男人，背着一只补了又补的编织袋。他对城市的下水道和废弃楼道比地图还熟。",
+      "tags": [
+        "city",
+        "home",
+        "store",
+        "rural"
+      ],
+      "attributes": [
+        {
+          "label": "体力",
+          "value": "6 / 10"
+        },
+        {
+          "label": "敏捷",
+          "value": "4 / 10"
+        },
+        {
+          "label": "感知",
+          "value": "7 / 10"
+        },
+        {
+          "label": "态度",
+          "value": "谨慎，但愿意换消息"
+        }
+      ],
+      "intel": [
+        "sewer_sound_rumor",
+        "fake_bunker_cache"
+      ]
+    },
+    {
+      "id": "nurse_anna",
+      "name": "护士安娜",
+      "role": "社区护士",
+      "faction": "圣玛丽医院",
+      "phase": 1,
+      "desc": "她把头发剪得很短，白大褂口袋里塞满了写满药名的便签。对幸存者还算有耐心。",
+      "tags": [
+        "city",
+        "hospital",
+        "official",
+        "rural"
+      ],
+      "attributes": [
+        {
+          "label": "体力",
+          "value": "4 / 10"
+        },
+        {
+          "label": "意志",
+          "value": "7 / 10"
+        },
+        {
+          "label": "医疗",
+          "value": "8 / 10"
+        },
+        {
+          "label": "态度",
+          "value": "愿意帮助，但讨厌偷药的人"
+        }
+      ],
+      "intel": [
+        "school_shelter_rumor"
+      ]
+    },
+    {
+      "id": "professor_lin",
+      "name": "林澄",
+      "role": "碧落研究园区研究员",
+      "faction": "碧落计划",
+      "phase": 2,
+      "desc": "身份卡上的人。她说话时总在观察你的反应，像是在确认你是不是“这个循环里的人”。",
+      "tags": [
+        "city",
+        "research",
+        "facility",
+        "lab"
+      ],
+      "attributes": [
+        {
+          "label": "体力",
+          "value": "3 / 10"
+        },
+        {
+          "label": "意志",
+          "value": "9 / 10"
+        },
+        {
+          "label": "权限",
+          "value": "B2"
+        },
+        {
+          "label": "态度",
+          "value": "冷淡，愿意用情报换安全"
+        }
+      ],
+      "intel": [
+        "research_id_card_intel",
+        "lab_password_note"
+      ]
+    },
+    {
+      "id": "guard_tom",
+      "name": "守卫汤姆",
+      "role": "军事检查站守卫",
+      "faction": "州国民警卫队",
+      "phase": 2,
+      "desc": "防弹背心外面套着一件脏兮兮的军绿色外套。他并不凶，只是很累，而且不信任陌生人。",
+      "tags": [
+        "military",
+        "facility",
+        "wild"
+      ],
+      "attributes": [
+        {
+          "label": "体力",
+          "value": "8 / 10"
+        },
+        {
+          "label": "敏捷",
+          "value": "5 / 10"
+        },
+        {
+          "label": "装备",
+          "value": "步枪、防弹背心"
+        },
+        {
+          "label": "态度",
+          "value": "警惕，接受交换"
+        }
+      ],
+      "intel": [
+        "military_map"
+      ]
+    },
+    {
+      "id": "shopkeeper_wang",
+      "name": "王婶",
+      "role": "超市店员",
+      "faction": "港湾超市",
+      "phase": 1,
+      "desc": "她守着一间还没被搬空的超市，把每一样东西都记在小本子上。她说自己只是舍不得。",
+      "tags": [
+        "city",
+        "store",
+        "rural"
+      ],
+      "attributes": [
+        {
+          "label": "体力",
+          "value": "3 / 10"
+        },
+        {
+          "label": "感知",
+          "value": "6 / 10"
+        },
+        {
+          "label": "态度",
+          "value": "和气，但会盯着你的手"
+        }
+      ],
+      "intel": [
+        "supermarket_stock_rumor",
+        "tourist_map"
+      ]
+    },
+    {
+      "id": "courier_xia",
+      "name": "小夏",
+      "role": "骑行者",
+      "faction": "无",
+      "phase": 2,
+      "desc": "她骑一辆改装过的自行车，车后架绑着收音机和天线。她说自己只是替人跑腿，顺便听听广播。",
+      "tags": [
+        "city",
+        "rural",
+        "road",
+        "station"
+      ],
+      "attributes": [
+        {
+          "label": "体力",
+          "value": "6 / 10"
+        },
+        {
+          "label": "敏捷",
+          "value": "8 / 10"
+        },
+        {
+          "label": "装备",
+          "value": "改装自行车、手摇收音机"
+        },
+        {
+          "label": "态度",
+          "value": "健谈，消息灵通"
+        }
+      ],
+      "intel": [
+        "zombie_weakness_announcement"
+      ]
+    },
+    {
+      "id": "teacher_qin",
+      "name": "秦老师",
+      "role": "小学教师",
+      "faction": "波士顿公立学校",
+      "phase": 1,
+      "desc": "她把剩下的学生安置在体育馆里，白天照常上课，晚上在门口守着。手边总有一盒粉笔。",
+      "tags": [
+        "city",
+        "school",
+        "home"
+      ],
+      "attributes": [
+        {
+          "label": "体力",
+          "value": "4 / 10"
+        },
+        {
+          "label": "意志",
+          "value": "8 / 10"
+        },
+        {
+          "label": "态度",
+          "value": "温和，但会阻止你拿走孩子们的口粮"
+        }
+      ],
+      "intel": [
+        "school_shelter_rumor",
+        "game_progress_note"
+      ]
+    }
+  ]
+}
