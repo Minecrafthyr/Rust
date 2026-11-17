@@ -1,5 +1,6 @@
+use std::boxed::Box;
+use std::error::Error;
 use std::fmt::{Display, Write as _};
-use std::io::ErrorKind::Other;
 use std::io::Write as _;
 use std::ops::{Bound, RangeBounds};
 use std::str::FromStr;
@@ -27,7 +28,7 @@ fn input_cursor_position() -> (u16, u16) {
 
 fn draw_input(
   s: &mut ScreenWriter, input: &str, placeholder: Option<&str>,
-) -> Result<(), std::io::Error> {
+) -> Result<(), Box<dyn Error>> {
   let (column, row) = input_cursor_position();
   execute!(s.out, MoveTo(column, row), Clear(UntilNewLine))?;
   if input.is_empty() {
@@ -59,7 +60,17 @@ impl<
   RangeT: RangeBounds<T>,
 > NumberRequester<'a, PromptT, T, RangeT>
 {
-  pub fn request(self) -> Result<Option<T>, std::io::Error>
+  /// Asks for a number in `range`, returning `default` when the player cancels.
+  pub fn ask(prompt: PromptT, range: RangeT, default: T) -> Result<T, Box<dyn Error>>
+  where
+    <T as FromStr>::Err: std::fmt::Debug,
+  {
+    Ok(
+      Self { prompt, range: Some(range), default: Some(default), .. }.request()?.unwrap_or(default),
+    )
+  }
+
+  pub fn request(self) -> Result<Option<T>, Box<dyn Error>>
   where
     <T as FromStr>::Err: std::fmt::Debug,
   {
@@ -72,7 +83,7 @@ impl<
     result
   }
 
-  fn request_visible(self, s: &mut ScreenWriter) -> Result<Option<T>, std::io::Error>
+  fn request_visible(self, s: &mut ScreenWriter) -> Result<Option<T>, Box<dyn Error>>
   where
     <T as FromStr>::Err: std::fmt::Debug,
   {
@@ -163,7 +174,11 @@ pub struct StringRequester<'a, PromptT: Display> {
   pub default: Option<String> = None,
 }
 impl<'a, PromptT: Display> StringRequester<'a, PromptT> {
-  pub fn request(self) -> Result<Option<String>, std::io::Error> {
+  pub fn ask(prompt: PromptT, default: String) -> Result<String, Box<dyn Error>> {
+    Ok(Self { prompt, default: Some(default.clone()), .. }.request()?.unwrap_or(default))
+  }
+
+  pub fn request(self) -> Result<Option<String>, Box<dyn Error>> {
     // See [`NumberRequester::request`]: the cursor is only visible while the player is typing.
     let mut s = ScreenWriter::new();
     execute!(s.out, Show)?;
@@ -172,7 +187,7 @@ impl<'a, PromptT: Display> StringRequester<'a, PromptT> {
     result
   }
 
-  fn request_visible(self, s: &mut ScreenWriter) -> Result<Option<String>, std::io::Error> {
+  fn request_visible(self, s: &mut ScreenWriter) -> Result<Option<String>, Box<dyn Error>> {
     writeln!(s, "{}：", self.prompt)?;
     s.end()?;
     let placeholder = self.default.as_deref();
@@ -214,11 +229,16 @@ impl<'a, PromptT: Display> StringRequester<'a, PromptT> {
 pub struct DataItem<
   StrT: AsRef<str>,
   SelectedFn, //FnMut(&StrT) -> StrT
-  EnterFn,    //FnMut(usize) -> Result<ReT, Box<dyn ToString>>
+  EnterFn,    //FnMut(usize) -> Result<ReT, String>
 > {
   pub text: StrT,
   pub selected: SelectedFn,
   pub enter: EnterFn,
+}
+impl<StrT: AsRef<str>, SelectedFn, EnterFn> DataItem<StrT, SelectedFn, EnterFn> {
+  pub fn new(text: StrT, selected: SelectedFn, enter: EnterFn) -> Self {
+    Self { text, selected, enter }
+  }
 }
 
 /// An inline selector for a value in a range or in a fixed list of options.
@@ -377,7 +397,7 @@ impl ChoiceBlock {
   }
 
   /// Displays the block and lets the player change it until Enter confirms.
-  pub fn request(mut self) -> Result<Option<Self>, std::io::Error> {
+  pub fn request(mut self) -> Result<Option<Self>, Box<dyn Error>> {
     let mut s = ScreenWriter::new_screen();
     loop {
       s.reset_pos()?;
@@ -405,19 +425,18 @@ impl Display for ChoiceBlock {
 }
 
 pub trait DrawEntries {
-  fn draw_entries(&mut self, s: &mut ScreenWriter) -> Result<(), std::io::Error>;
+  fn draw_entries(&mut self, s: &mut ScreenWriter) -> Result<(), Box<dyn Error>>;
 }
 impl<TitleT: AsRef<str>, StrT: AsRef<str>, SelectedFn: FnMut(&StrT) -> StrT, EnterFn> DrawEntries
   for DisplayList<TitleT, StrT, SelectedFn, EnterFn>
 {
-  fn draw_entries(&mut self, s: &mut ScreenWriter) -> Result<(), std::io::Error> {
+  fn draw_entries(&mut self, s: &mut ScreenWriter) -> Result<(), Box<dyn Error>> {
     let range = self.visible_range();
     for (i, DataItem { text, selected, .. }) in
       self.data.iter_mut().enumerate().skip(range.start).take(range.len())
     {
       if self.indexed {
-        write!(s, "[{i}] ")
-          .map_err(|_| std::io::Error::new(Other, "format error: cannot write to screen"))?;
+        write!(s, "[{i}] ")?;
       }
       if i == self.selecting {
         s.writeln((selected)(text).as_ref().attribute(Bold))?;
@@ -431,14 +450,13 @@ impl<TitleT: AsRef<str>, StrT: AsRef<str>, SelectedFn: FnMut(&StrT) -> StrT, Ent
 impl<TitleT: AsRef<str>, StrT: AsRef<str>, EnterFn> DrawEntries
   for DisplayList<TitleT, StrT, (), EnterFn>
 {
-  fn draw_entries(&mut self, s: &mut ScreenWriter) -> Result<(), std::io::Error> {
+  fn draw_entries(&mut self, s: &mut ScreenWriter) -> Result<(), Box<dyn Error>> {
     let range = self.visible_range();
     for (i, DataItem { text, .. }) in
       self.data.iter_mut().enumerate().skip(range.start).take(range.len())
     {
       if self.indexed {
-        write!(s, "[{i}] ")
-          .map_err(|_| std::io::Error::new(Other, "format error: cannot write to screen"))?;
+        write!(s, "[{i}] ")?;
       }
       if i == self.selecting {
         s.writeln(text.as_ref().attribute(Bold))?;
@@ -451,7 +469,7 @@ impl<TitleT: AsRef<str>, StrT: AsRef<str>, EnterFn> DrawEntries
 }
 pub trait Enter {
   type ReT;
-  fn enter(&mut self, s: &mut ScreenWriter) -> Result<Option<Self::ReT>, std::io::Error>;
+  fn enter(&mut self, s: &mut ScreenWriter) -> Result<Option<Self::ReT>, Box<dyn Error>>;
 }
 
 impl<
@@ -459,18 +477,20 @@ impl<
   TitleT: AsRef<str>,
   StrT: AsRef<str>,
   SelectedFn,
-  EnterFn: FnMut(usize) -> Result<ReT, Box<dyn ToString>>,
+  EnterFn: FnMut(usize) -> Result<ReT, String>,
 > Enter for DisplayList<TitleT, StrT, SelectedFn, EnterFn>
 {
   type ReT = ReT;
 
-  fn enter(&mut self, s: &mut ScreenWriter) -> Result<Option<ReT>, std::io::Error> {
+  fn enter(&mut self, s: &mut ScreenWriter) -> Result<Option<ReT>, Box<dyn Error>> {
     let f = &mut self.data[self.selecting].enter;
     match (f)(self.selecting) {
-    Ok(r) => return Ok(Some(r)),
-    Err(e) => _ = s.message(e.to_string())?,
+    Ok(r) => Ok(Some(r)),
+    Err(e) => {
+      _ = s.message(e)?;
+      Ok(None)
     }
-    Ok(None)
+    }
   }
 }
 impl<TitleT: AsRef<str>, StrT: AsRef<str>, SelectedFn> Enter
@@ -478,7 +498,7 @@ impl<TitleT: AsRef<str>, StrT: AsRef<str>, SelectedFn> Enter
 {
   type ReT = ();
 
-  fn enter(&mut self, _s: &mut ScreenWriter) -> Result<Option<()>, std::io::Error> { Ok(None) }
+  fn enter(&mut self, _s: &mut ScreenWriter) -> Result<Option<()>, Box<dyn Error>> { Ok(None) }
 }
 #[expect(unevaluated_default_field_value)]
 pub struct DisplayList<TitleT: AsRef<str>, StrT: AsRef<str>, SelectedFn, EnterFn> {
@@ -583,7 +603,7 @@ impl<TitleT: AsRef<str>, StrT: AsRef<str>, SelectedFn, EnterFn>
     self.scroll = self.scroll.min(len.saturating_sub(view));
   }
 
-  fn draw_header(&mut self, s: &mut ScreenWriter) -> Result<(), std::io::Error> {
+  fn draw_header(&mut self, s: &mut ScreenWriter) -> Result<(), Box<dyn Error>> {
     if let Some(t) = self.title.as_ref() {
       s.write(t.as_ref())?;
     }
@@ -617,7 +637,7 @@ where
 {
   pub fn run(
     &mut self, s: &mut ScreenWriter,
-  ) -> Result<Option<<Self as Enter>::ReT>, std::io::Error> {
+  ) -> Result<Option<<Self as Enter>::ReT>, Box<dyn Error>> {
     'io: loop {
       if self.height.is_none() {
         let (_, rows) = crossterm::terminal::size()?;
@@ -738,7 +758,7 @@ where
 impl ScreenWriter {
   pub fn list<TitleT: AsRef<str>, StrT: AsRef<str>, SelectedFn, EnterFn>(
     &mut self, mut display_list: DisplayList<TitleT, StrT, SelectedFn, EnterFn>,
-  ) -> Result<Option<<DisplayList<TitleT, StrT, SelectedFn, EnterFn> as Enter>::ReT>, std::io::Error>
+  ) -> Result<Option<<DisplayList<TitleT, StrT, SelectedFn, EnterFn> as Enter>::ReT>, Box<dyn Error>>
   where
     DisplayList<TitleT, StrT, SelectedFn, EnterFn>: DrawEntries + Enter,
   {
@@ -751,7 +771,7 @@ impl ScreenWriter {
     &mut self, mut display_list: DisplayList<TitleT, StrT, SelectedFn, EnterFn>,
   ) -> Result<
     (Option<<DisplayList<TitleT, StrT, SelectedFn, EnterFn> as Enter>::ReT>, Option<ChoiceBlock>),
-    std::io::Error,
+    Box<dyn Error>,
   >
   where
     DisplayList<TitleT, StrT, SelectedFn, EnterFn>: DrawEntries + Enter,
@@ -760,17 +780,17 @@ impl ScreenWriter {
     Ok((result, display_list.choice))
   }
 
-  pub fn message(&mut self, msg: impl AsRef<str>) -> Result<&mut Self, std::io::Error> {
+  pub fn message(&mut self, msg: impl AsRef<str>) -> Result<&mut Self, Box<dyn Error>> {
     crate::io::record_log(msg.as_ref());
     self.message_inner(msg)
   }
 
   /// Shows a message without adding it to the operation history (for descriptions and help).
-  pub fn message_detail(&mut self, msg: impl AsRef<str>) -> Result<&mut Self, std::io::Error> {
+  pub fn message_detail(&mut self, msg: impl AsRef<str>) -> Result<&mut Self, Box<dyn Error>> {
     self.message_inner(msg)
   }
 
-  fn message_inner(&mut self, msg: impl AsRef<str>) -> Result<&mut Self, std::io::Error> {
+  fn message_inner(&mut self, msg: impl AsRef<str>) -> Result<&mut Self, Box<dyn Error>> {
     self.writeln(msg.as_ref())?;
     self.end()?;
     sleep(AVOID_MISTAKE_INPUT_DUR);
@@ -805,7 +825,7 @@ mod tests {
   fn choice_block_can_be_attached_to_a_display_list() {
     let list = DisplayList::indexed(
       "title",
-      Vec::<DataItem<String, (), fn(usize) -> Result<(), Box<dyn ToString>>>>::new(),
+      Vec::<DataItem<String, (), fn(usize) -> Result<(), String>>>::new(),
     )
     .choice(ChoiceBlock::options("choice", ["on", "off"]));
     assert_eq!(list.choice.as_ref().map(ChoiceBlock::value_text).as_deref(), Some("on"));

@@ -97,7 +97,7 @@ pub struct NpcRecord {
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
-pub struct ChronicleEntry {
+pub struct EventEntry {
   pub cycle: u32,
   pub turn: u32,
   pub clock_ds: u64,
@@ -142,9 +142,9 @@ pub struct Archive {
   /// NPCs the character has met.
   #[serde(default)]
   pub npcs: BTreeMap<String, NpcRecord>,
-  /// Cross-cycle chronicle of major events.
+  /// Cross-cycle record of major events (shown as the archive's 事件 page).
   #[serde(default)]
-  pub chronicle: Vec<ChronicleEntry>,
+  pub events: Vec<EventEntry>,
   /// Creature weaknesses: creature id -> weakness ids.
   #[serde(default)]
   pub weaknesses: BTreeMap<String, BTreeSet<String>>,
@@ -154,6 +154,17 @@ pub struct Archive {
   /// Sites whose guaranteed restock has been confirmed by the archive.
   #[serde(default)]
   pub restock_known: BTreeSet<String>,
+  /// Chronicle entries unlocked by reaching their date and satisfying an unlock condition.
+  #[serde(default)]
+  pub history_unlocked: BTreeSet<String>,
+  /// Whether the current chronicle rules have been applied to this archive. Older archives are
+  /// backfilled by phase once, then tracked under the date/condition rules.
+  #[serde(default)]
+  pub history_tracking: bool,
+  /// One-off world events that can reveal a chronicle: hearing a broadcast, seeing an alternate
+  /// space, obtaining the Azure record.
+  #[serde(default)]
+  pub history_flags: BTreeSet<String>,
 }
 
 impl Archive {
@@ -324,13 +335,13 @@ impl Archive {
     self.npcs.entry(npc.to_string()).or_default().intel.insert(intel.to_string())
   }
 
-  pub fn chronicle(
+  pub fn event(
     &mut self, cycle: u32, turn: u32, clock_ds: u64, severity: crate::model::world::Severity,
     text: impl Into<String>,
   ) {
-    self.chronicle.push(ChronicleEntry { cycle, turn, clock_ds, severity, text: text.into() });
-    if self.chronicle.len() > 400 {
-      self.chronicle.drain(0..100);
+    self.events.push(EventEntry { cycle, turn, clock_ds, severity, text: text.into() });
+    if self.events.len() > 400 {
+      self.events.drain(0..100);
     }
   }
 
@@ -339,9 +350,23 @@ impl Archive {
   }
 
   pub fn restock_known(&self, id: &str) -> bool { self.restock_known.contains(id) }
+
+  /// Record that a chronicle entry has been unlocked. Returns whether this was the first time.
+  pub fn unlock_history(&mut self, id: &str) -> bool {
+    self.history_unlocked.insert(id.to_string())
+  }
+
+  pub fn history_unlocked(&self, id: &str) -> bool { self.history_unlocked.contains(id) }
+
+  /// Record a one-off event that can satisfy chronicle conditions.
+  pub fn mark_history_flag(&mut self, flag: &str) -> bool {
+    self.history_flags.insert(flag.to_string())
+  }
+
+  pub fn history_flag(&self, flag: &str) -> bool { self.history_flags.contains(flag) }
 }
 
-/// On-disk shape before structured intel, sources, chronicle, NPCs and weaknesses were added.
+/// On-disk shape before structured intel, sources, events, NPCs and weaknesses were added.
 ///
 /// Kept only for migration; new saves always use [`Archive`].
 #[derive(Clone, Debug, serde::Deserialize)]

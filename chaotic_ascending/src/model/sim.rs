@@ -8,7 +8,7 @@ use std::collections::BTreeMap;
 
 use crate::{
   config::{Config, Paths},
-  content::{Content, LootEntry, Region, RestockHint, SiteDef},
+  content::{Content, HistoryCondition, HistoryEntry, LootEntry, Region, RestockHint, SiteDef},
   model::{
     archive::{Archive, EntryKind},
     player::Player,
@@ -326,6 +326,8 @@ impl Sim {
       state.visits = 1;
       state.known_phase = phase;
     }
+    // Archives written before chronicle conditions existed are backfilled by phase once.
+    let backfill_history = archive.runs > 0 && !archive.history_tracking;
     archive.runs += 1;
     let mut sim = Self {
       state: GameState {
@@ -385,14 +387,89 @@ impl Sim {
     );
     sim.last_action = site.name;
     sim.update_map();
-    sim.record_chronicle(
+    sim.record_event(
       Severity::Important,
       format!("第 {} 次循环开始，{}。", sim.archive.runs, sim.current_site().name),
     );
+    sim.init_history(backfill_history);
     sim
   }
 
   pub fn phase(&self) -> u8 { self.state.phase(&self.config) }
+
+  /// Apply the chronicle rules for the first time an archive is used by this version.
+  ///
+  /// Archives from before chronicle conditions were introduced are backfilled with every entry
+  /// their phase had already revealed, so old saves keep their timeline.
+  pub(crate) fn init_history(&mut self, backfill: bool) {
+    if !self.archive.history_tracking {
+      if backfill {
+        let phase = self.phase();
+        for entry in self.content.history.clone() {
+          if entry.phase <= phase {
+            self.archive.unlock_history(&entry.id);
+          }
+        }
+      }
+      self.archive.history_tracking = true;
+    }
+    self.refresh_history();
+  }
+
+  /// Unlock every chronicle entry whose date has passed and whose condition is now met.
+  pub(crate) fn refresh_history(&mut self) {
+    let clock = self.state.world.clock_ds;
+    for entry in self.content.history.clone() {
+      if self.archive.history_unlocked(&entry.id) || !entry.time_reached(clock) {
+        continue;
+      }
+      if entry.unlock.is_empty()
+        || entry.unlock.iter().any(|condition| self.history_condition_met(condition))
+      {
+        self.unlock_history_entry(&entry);
+      }
+    }
+  }
+
+  fn history_condition_met(&self, condition: &HistoryCondition) -> bool {
+    match condition {
+    HistoryCondition::SiteTag(tag) => self.all_site_defs().iter().any(|site| {
+      site.tags.iter().any(|site_tag| site_tag == tag) && self.archive.site_visited(&site.id)
+    }),
+    HistoryCondition::Site(id) => self.archive.site_visited(id),
+    HistoryCondition::Intel(id) => self.archive.intel_record(id).is_some(),
+    HistoryCondition::Creature(id) => self.archive.has_seen_creature(id),
+    HistoryCondition::Broadcast => self.archive.history_flag("broadcast"),
+    HistoryCondition::Power => self.current_site().tags.iter().any(|tag| tag == "powered"),
+    HistoryCondition::Notification => self.has_phone(),
+    HistoryCondition::AlternateSpace =>
+      self.archive.history_flag("alternate_space")
+        || self.state.world.story_flags.iter().any(|flag| flag == "story:bunker"),
+    HistoryCondition::ResearchRecord =>
+      self.archive.history_flag("research_record")
+        || self.state.world.story_flags.iter().any(|flag| flag == "story:research_park"),
+    }
+  }
+
+  fn unlock_history_entry(&mut self, entry: &HistoryEntry) {
+    if !self.archive.unlock_history(&entry.id) {
+      return;
+    }
+    if entry.unlock.iter().any(|condition| matches!(condition, HistoryCondition::Notification)) {
+      self.log_cat(
+        LogCategory::Info,
+        Severity::Important,
+        format!("你收到一条关于「{}」的通知。", entry.title),
+      );
+    }
+    let first_line = entry.text.lines().next().unwrap_or("");
+    self.log_cat(
+      LogCategory::Archive,
+      Severity::Important,
+      format!("纪事解锁：《{}》——{first_line}", entry.title),
+    );
+    self.note(format!("纪事：{}", entry.title));
+  }
 
   pub fn site_def(&self, id: &str) -> Option<&SiteDef> {
     self.content.site(id).or_else(|| self.state.world.extra_sites.iter().find(|site| site.id == id))
@@ -515,17 +592,16 @@ impl Sim {
     if !allowed {
       return false;
     }
-    self.state.player.body_id = Some(host.id.clone());
-    self.state.player.name = host.name.clone();
-    self.state.player.max_health = self.state.player.max_health.max(host.health.clamp(20, 220));
-    self.state.player.health = self.state.player.max_health;
+    let Player { body_id, name, max_health, health, stats, .. } = &mut self.state.player;
+    *body_id = Some(host.id.clone());
+    *name = host.name.clone();
+    *max_health = (*max_health).max(host.health.clamp(20, 220));
+    *health = *max_health;
     let boost = (host.damage / 5).clamp(0, 5);
-    self.state.player.stats.strength =
-      self.state.player.stats.strength.saturating_add(boost as u8).min(20);
-    self.state.player.stats.agility =
-      self.state.player.stats.agility.saturating_add((boost / 2) as u8).min(20);
+    stats.strength = stats.strength.saturating_add(boost as u8).min(20);
+    stats.agility = stats.agility.saturating_add((boost / 2) as u8).min(20);
     if host.brain {
-      self.state.player.stats.will = self.state.player.stats.will.saturating_add(2).min(20);
+      stats.will = stats.will.saturating_add(2).min(20);
     }
     match host.id.as_str() {
     "government_guard" =>
@@ -586,6 +662,7 @@ impl Sim {
     });
     let network_intel = self.content.intel.iter().any(|def| {
       def.category == crate::content::IntelCategory::Network
+        && self.news_due(def)
         && self.archive.intel_record(&def.id).is_none()
     });
     let weakness = self.content.weaknesses.iter().any(|weakness| {
@@ -957,11 +1034,25 @@ impl Sim {
       }
     }
 
+    if self.phase() >= 4
+      && !self.archive.history_flag("alternate_space")
+      && self.state.rng.chance((ds / 600).min(25) as u32)
+    {
+      self.archive.mark_history_flag("alternate_space");
+      self.log_cat(
+        LogCategory::World,
+        Severity::Critical,
+        "你看见街道像纸一样折起，折痕后面是另一片不属于这里的天光。",
+      );
+      self.note("目睹：异空间");
+    }
+
     self.refresh_restocks();
     let after_phase = self.phase();
     if after_phase > before_phase {
       self.phase_transition(after_phase);
     }
+    self.refresh_history();
     if self.state.player.health <= 0 {
       self.end_run(
         format!(
@@ -989,7 +1080,7 @@ impl Sim {
       Severity::Critical,
       format!("{}：{}", phase_title(phase), phase_desc(phase)),
     );
-    self.record_chronicle(Severity::Critical, format!("世界进入{}。", phase_title(phase)));
+    self.record_event(Severity::Critical, format!("世界进入{}。", phase_title(phase)));
     if phase == 2 {
       self.seed_outbreak();
     }
@@ -1061,7 +1152,7 @@ impl Sim {
       self.archive.phase_four_reached = true;
     }
     self.log_cat(LogCategory::World, Severity::Critical, reason.clone());
-    self.record_chronicle(
+    self.record_event(
       if death { Severity::Critical } else { Severity::Important },
       format!("本次循环结束：{reason}"),
     );

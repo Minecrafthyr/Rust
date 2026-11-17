@@ -1,7 +1,9 @@
 /target
-/data/config.json5
+/data/config.yaml
 /data/archive.bin
 /data/cache/
 /data/content.tmp/
 /data/worlds/
 /.dsh
+__pycache__/
+*.pyc

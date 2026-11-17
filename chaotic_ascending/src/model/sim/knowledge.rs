@@ -1,5 +1,5 @@
 use crate::{
-  content::{IntelImportance, SiteDef, WeaknessSource},
+  content::{IntelDef, IntelImportance, SiteDef, WeaknessSource},
   model::{
     archive::IntelStatus,
     sim::Sim,
@@ -8,11 +8,54 @@ use crate::{
 };
 
 impl Sim {
-  pub(crate) fn record_chronicle(&mut self, severity: Severity, text: impl Into<String>) {
+  pub(crate) fn record_event(&mut self, severity: Severity, text: impl Into<String>) {
     let cycle = self.archive.runs;
     let turn = self.state.world.turn;
     let clock_ds = self.state.world.clock_ds;
-    self.archive.chronicle(cycle, turn, clock_ds, severity, text);
+    self.archive.event(cycle, turn, clock_ds, severity, text);
+  }
+
+  /// A news bulletin is only available once the chronicle it reports on has reached its date.
+  pub(crate) fn news_due(&self, def: &IntelDef) -> bool {
+    let Some(id) = def.news_for.as_deref() else {
+      return true;
+    };
+    self
+      .content
+      .history
+      .iter()
+      .find(|entry| entry.id == id)
+      .is_none_or(|entry| entry.time_reached(self.state.world.clock_ds))
+  }
+
+  /// Reveal the most recent news bulletin whose chronicle date has already passed.
+  ///
+  /// Monitoring the network is the main way to "learn the corresponding news" for a chronicle.
+  pub(crate) fn reveal_due_news(&mut self) -> bool {
+    let clock = self.state.world.clock_ds;
+    let latest = self
+      .content
+      .intel
+      .iter()
+      .filter(|def| def.news_for.is_some())
+      .filter(|def| self.archive.intel_record(&def.id).is_none())
+      .filter_map(|def| {
+        let history = def
+          .news_for
+          .as_deref()
+          .and_then(|id| self.content.history.iter().find(|entry| entry.id == id))?;
+        if !history.time_reached(clock) {
+          return None;
+        }
+        Some((history.after_ds().unwrap_or(0), def.id.clone()))
+      })
+      .max_by_key(|(after, _)| *after);
+    let Some((_, id)) = latest else {
+      return false;
+    };
+    self.log_cat(LogCategory::Info, Severity::Important, "网络与广播里正在播报一条新闻。");
+    self.learn_intel_def(&id, "新闻播报");
+    true
   }
 
   /// Record a structured intel entry. Returns whether this was the first source.
@@ -37,9 +80,13 @@ impl Sim {
         Severity::Important,
         format!("获得情报《{}》（来源：{source}）。", def.title),
       );
+      if def.news_for.is_some() {
+        let first_line = def.content.lines().next().unwrap_or("");
+        self.log_cat(LogCategory::Info, Severity::Normal, format!("新闻：{first_line}"));
+      }
       self.note(format!("情报：{}", def.title));
       if matches!(def.importance, IntelImportance::High | IntelImportance::Critical) {
-        self.record_chronicle(
+        self.record_event(
           Severity::Important,
           format!("获得情报《{}》，来源：{source}。", def.title),
         );
@@ -54,7 +101,9 @@ impl Sim {
     let unknown = site
       .intel
       .iter()
-      .filter(|id| self.content.intel(id).is_some_and(|def| def.phase <= phase))
+      .filter(|id| {
+        self.content.intel(id).is_some_and(|def| def.phase <= phase && self.news_due(def))
+      })
       .filter(|id| self.archive.intel_record(id).is_none())
       .cloned()
       .collect::<Vec<_>>();
@@ -94,7 +143,7 @@ impl Sim {
           ),
         );
         self.note(format!("假情报：《{}》", def.title));
-        self.record_chronicle(
+        self.record_event(
           Severity::Important,
           format!("在{}核实情报《{}》，确认是假情报。", self.current_site().name, def.title),
         );
@@ -212,19 +261,6 @@ impl Sim {
       ),
     );
     self.note(format!("弱点报告：{}", weakness.name));
-    self.record_chronicle(
-      Severity::Important,
-      format!(
-        "从网络公告得知{}的弱点：{}。",
-        self
-          .content
-          .creatures
-          .iter()
-          .find(|creature| creature.id == weakness.creature)
-          .map_or(weakness.creature.as_str(), |creature| creature.name.as_str()),
-        weakness.name
-      ),
-    );
     true
   }
 
@@ -285,10 +321,6 @@ impl Sim {
       ),
     );
     self.note(format!("研究设施弱点报告：{}", weakness.name));
-    self.record_chronicle(
-      Severity::Important,
-      format!("在{}获得弱点报告：{}。", site.name, weakness.name),
-    );
     true
   }
 
@@ -342,10 +374,6 @@ impl Sim {
       return false;
     }
     self.note(format!("弱点：{}（{}）", learned.join("、"), name));
-    self.record_chronicle(
-      Severity::Important,
-      format!("{prefix}发现{name}的弱点：{}。", learned.join("、")),
-    );
     true
   }
 }

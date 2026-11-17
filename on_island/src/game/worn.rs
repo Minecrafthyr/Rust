@@ -9,9 +9,12 @@ impl Game {
   /// holds it, and only when both are full does it end up on the ground.
   pub(crate) fn unequip_item(
     &mut self, s: &mut ScreenWriter, index: usize,
-  ) -> Result<(), std::io::Error> {
+  ) -> Result<(), Box<dyn std::error::Error>> {
     if index >= self.player.worn.len() {
-      return Err(std::io::Error::new(std::io::ErrorKind::NotFound, ActionError::ItemMissing));
+      return Err(Box::new(std::io::Error::new(
+        std::io::ErrorKind::NotFound,
+        ActionError::ItemMissing,
+      )));
     }
     let item = self.player.worn.remove(index);
     self.player.update_posture_from_load();
@@ -39,7 +42,7 @@ impl Game {
 
   fn drop_unequipped(
     &mut self, s: &mut ScreenWriter, name: String, stack: ItemStack,
-  ) -> Result<(), std::io::Error> {
+  ) -> Result<(), Box<dyn std::error::Error>> {
     self.drop_items_at_player(ItemStacks(vec![stack]));
     s.message(t!("action.worn.unequipped_dropped", name = name))?;
     Ok(())

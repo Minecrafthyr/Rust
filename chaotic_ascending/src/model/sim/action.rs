@@ -2,6 +2,7 @@ use crate::{
   content::{CreatureDef, IntelCategory, ItemDef, ItemKind, LootEntry, SiteDef, SkillDef, Slot},
   model::{
     archive::EntryKind,
+    player::Player,
     rng::{Rng, weighted_index},
     sim::{Sim, weighted_pick},
     world::{LogCategory, Severity},
@@ -152,6 +153,14 @@ impl Sim {
     let severity = if first { Severity::Important } else { Severity::Normal };
     self.log_cat(LogCategory::Travel, severity, format!("抵达{}。", site.name));
     self.note(format!("抵达：{}", site.name));
+    if site.tags.iter().any(|tag| tag == "tower") && self.archive.mark_history_flag("broadcast") {
+      self.log_cat(
+        LogCategory::Info,
+        Severity::Important,
+        "广播塔的发射机仍在工作，你听到一段关于封锁与撤离的官方通告。",
+      );
+      self.note("广播：封锁与撤离通告");
+    }
     self.state.player.fatigue = self.state.player.fatigue.saturating_add(4).min(100);
     self.state.player.thirst = self.state.player.thirst.saturating_add(2).min(100);
     let traffic = self.state.world.map.route_congestion(&from, target);
@@ -324,20 +333,28 @@ impl Sim {
   pub(crate) fn monitor_network(&mut self) {
     self.state.player.fatigue = self.state.player.fatigue.saturating_add(2).min(100);
     self.log_cat(LogCategory::Info, Severity::Detail, "你花时间监听网络与官方广播。");
-    let roll = self.state.rng.range(100);
-    if roll < 55 {
-      if !self.discover_random_site() {
+    self.archive.mark_history_flag("broadcast");
+    let heard_news = self.reveal_due_news();
+    if !heard_news {
+      let roll = self.state.rng.range(100);
+      if roll < 55 {
+        if !self.discover_random_site() {
+          self.grant_intel();
+        }
+      } else if roll < 85 {
         self.grant_intel();
-      }
-    } else if roll < 85 {
-      self.grant_intel();
-    } else {
-      let items = self.content.items.clone();
-      if !items.is_empty() {
-        let item = items[self.state.rng.range(items.len() as u32) as usize].clone();
-        self.unlock_item(&item);
-        self.log_cat(LogCategory::Info, Severity::Detail, format!("网络档案补全：{}。", item.name));
-        self.note(format!("资料：{}", item.name));
+      } else {
+        let items = self.content.items.clone();
+        if !items.is_empty() {
+          let item = items[self.state.rng.range(items.len() as u32) as usize].clone();
+          self.unlock_item(&item);
+          self.log_cat(
+            LogCategory::Info,
+            Severity::Detail,
+            format!("网络档案补全：{}。", item.name),
+          );
+          self.note(format!("资料：{}", item.name));
+        }
       }
     }
     if self.state.rng.chance(40) {
@@ -347,6 +364,7 @@ impl Sim {
         .iter()
         .filter(|def| def.category == IntelCategory::Network)
         .filter(|def| def.phase <= self.phase())
+        .filter(|def| self.news_due(def))
         .filter(|def| self.archive.intel_record(&def.id).is_none())
         .map(|def| def.id.clone())
         .collect::<Vec<_>>();
@@ -398,8 +416,13 @@ impl Sim {
       if self.archive.grant_intel("bunker") {
         self.state.stats.intel = self.state.stats.intel.saturating_add(1);
       }
+      self.archive.mark_history_flag("research_record");
+      self.log_cat(LogCategory::Info, Severity::Critical, "你拷贝了一份「碧落计划」研究记录。");
       self.note("关键情报：地下实验室");
       if let Some(def) = self.content.item("lab_keycard").cloned() {
+        self.receive_item(&def, 1, 1.0);
+      }
+      if let Some(def) = self.content.item("azure_record").cloned() {
         self.receive_item(&def, 1, 1.0);
       }
     }
@@ -423,6 +446,8 @@ impl Sim {
         Severity::Critical,
         "最底层的门后不是实验室，而是一团不断折叠的现实。",
       );
+      self.archive.mark_history_flag("alternate_space");
+      self.note("目睹：异空间");
       self.state.player.magic = (self.state.player.magic + 5).min(30);
       self.state.player.psychic = (self.state.player.psychic + 5).min(30);
       self.state.player.soul = (self.state.player.soul + 3).min(30);
@@ -436,15 +461,16 @@ impl Sim {
 
   pub(crate) fn rest(&mut self) {
     self.state.stats.rests = self.state.stats.rests.saturating_add(1);
-    let fatigue = self.config.needs.rest_fatigue;
-    self.state.player.fatigue = self.state.player.fatigue.saturating_sub(fatigue);
-    if self.state.player.hunger < 70 && self.state.player.thirst < 75 {
-      let health = self.config.needs.rest_health;
-      self.state.player.health =
-        (self.state.player.health + health).min(self.state.player.max_health);
+    let rest_fatigue = self.config.needs.rest_fatigue;
+    let rest_health = self.config.needs.rest_health;
+    let Player { fatigue, health, hunger, thirst, max_health, psychic, magic, .. } =
+      &mut self.state.player;
+    *fatigue = fatigue.saturating_sub(rest_fatigue);
+    if *hunger < 70 && *thirst < 75 {
+      *health = (*health + rest_health).min(*max_health);
     }
-    self.state.player.psychic = (self.state.player.psychic + 1).min(30);
-    self.state.player.magic = (self.state.player.magic + 1).min(30);
+    *psychic = (*psychic + 1).min(30);
+    *magic = (*magic + 1).min(30);
     self.log_cat(LogCategory::Needs, Severity::Detail, "你休息了一段时间。");
     let site = self.site_def(&self.state.world.current).cloned();
     if let Some(site) = site {
@@ -876,6 +902,17 @@ impl Sim {
       .stacks
       .iter()
       .any(|stack| matches!(stack.id.as_str(), "phone" | "tablet" | "hand_radio"))
+  }
+
+  /// A phone or tablet can receive the official notifications that reveal some chronicles.
+  pub(crate) fn has_phone(&self) -> bool {
+    self
+      .state
+      .player
+      .inventory
+      .stacks
+      .iter()
+      .any(|stack| matches!(stack.id.as_str(), "phone" | "tablet"))
   }
 
   #[allow(dead_code)]

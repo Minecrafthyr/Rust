@@ -1,0 +1,866 @@
+creatures:
+- attacks: []
+  damage: 0
+  defense: 0
+  desc: 警惕但还愿意交流的人。会分享附近的消息，也可能留下一点物资。
+  friendly: true
+  habitats:
+  - city
+  - rural
+  - wild
+  health: 20
+  id: survivor
+  human: true
+  brain: true
+  materials: []
+  name: 幸存者
+  phase: 1
+  skills: []
+  weight: 6
+- attacks: []
+  damage: 0
+  defense: 0
+  desc: 背着旧背包的徒步者，对森林和山路比常人熟悉。
+  friendly: true
+  habitats:
+  - rural
+  - wild
+  - forest
+  health: 18
+  id: hiker
+  human: true
+  brain: true
+  materials: []
+  name: 徒步者
+  phase: 1
+  skills: []
+  weight: 5
+- attacks:
+  - 扑咬
+  - 低吼撕扯
+  damage: 5
+  defense: 0
+  desc: 瘦得能看见肋骨，护食时攻击性极强。
+  friendly: false
+  habitats:
+  - city
+  - rural
+  - wild
+  health: 18
+  id: stray_dog
+  materials:
+  - animal_bone
+  name: 流浪犬
+  phase: 1
+  skills: []
+  weight: 12
+- attacks:
+  - 啃咬
+  - 窜上小腿
+  damage: 3
+  defense: 0
+  desc: 在垃圾和尸体之间繁殖的鼠群，单只不可怕，数量很可怕。
+  friendly: false
+  habitats:
+  - city
+  - rural
+  - tunnel
+  health: 12
+  id: rat_swarm
+  materials:
+  - animal_bone
+  name: 鼠群
+  phase: 1
+  skills: []
+  weight: 10
+- attacks:
+  - 挥棍
+  - 推搡
+  - 抢夺背包
+  damage: 6
+  defense: 1
+  desc: 把同类视为资源的活人。不会因为你是玩家就手下留情。
+  friendly: false
+  habitats:
+  - city
+  - rural
+  health: 26
+  id: looter
+  human: true
+  brain: true
+  materials:
+  - scrap
+  name: 掠夺者
+  phase: 1
+  skills: []
+  weight: 9
+- attacks:
+  - 抓挠
+  - 撕咬
+  - 扑倒
+  damage: 8
+  defense: 1
+  desc: 被病毒感染后失去正常思维的人或动物，靠本能聚在一起。
+  friendly: false
+  habitats:
+  - city
+  - rural
+  - wild
+  - hospital
+  - tunnel
+  health: 34
+  id: zombie
+  brain: true
+  materials:
+  - zombie_tissue
+  name: 丧尸
+  phase: 2
+  skills:
+  - zombie_bite
+  weight: 16
+- attacks:
+  - 低吼
+  - 指挥尸群
+  damage: 10
+  defense: 2
+  desc: 逐渐恢复意识的丧尸，能聚集同类进行简单活动。不一定是敌人。
+  friendly: true
+  habitats:
+  - city
+  - rural
+  - wild
+  health: 60
+  id: zombie_leader
+  human: true
+  brain: true
+  materials: []
+  name: 丧尸首领
+  phase: 2
+  skills: []
+  weight: 3
+- attacks:
+  - 重击
+  - 撕裂
+  - 投掷碎块
+  damage: 14
+  defense: 3
+  desc: 吞食同类后异常膨胀的丧尸，身体里塞满了尚未消化的组织。
+  friendly: false
+  habitats:
+  - city
+  - facility
+  health: 70
+  id: zombie_tyrant
+  brain: true
+  materials:
+  - zombie_tissue
+  - mutated_gland
+  name: 尸群暴君
+  phase: 2
+  skills:
+  - zombie_bite
+  weight: 4
+- attacks:
+  - 顶撞
+  - 鹿角穿刺
+  damage: 7
+  defense: 0
+  desc: 鹿角上挂着干涸的血，眼睛已经浑浊。
+  friendly: false
+  habitats:
+  - rural
+  - wild
+  - forest
+  health: 28
+  id: infected_deer
+  materials:
+  - animal_bone
+  - mutated_gland
+  name: 感染鹿
+  phase: 2
+  skills: []
+  weight: 8
+- attacks:
+  - 包裹
+  - 酸蚀触碰
+  damage: 6
+  defense: 0
+  desc: 不同体型的胶质生物，会合并、分裂；被切开时可能分成两只。
+  friendly: false
+  habitats:
+  - city
+  - rural
+  - wild
+  - facility
+  health: 36
+  id: slime
+  materials:
+  - slime_sample
+  name: 黏液怪
+  phase: 2
+  skills:
+  - slime_split
+  weight: 10
+- attacks:
+  - 缠绕
+  - 抽打
+  - 突进
+  damage: 9
+  defense: 1
+  desc: 招式繁多的软体怪物，触手能从意想不到的角度发动攻击。
+  friendly: false
+  habitats:
+  - wild
+  - facility
+  - quarry
+  health: 42
+  id: tentacle
+  materials:
+  - tentacle_sucker
+  name: 触手怪
+  phase: 2
+  skills:
+  - tentacle_lash
+  weight: 7
+- attacks:
+  - 缠绕
+  - 抽打
+  damage: 8
+  defense: 1
+  desc: 会主动移动的植物，根须下埋着来历不明的骨头。
+  friendly: false
+  habitats:
+  - rural
+  - wild
+  - forest
+  health: 38
+  id: vine
+  materials:
+  - vine_fiber
+  name: 藤蔓怪
+  phase: 2
+  skills:
+  - vine_bind
+  weight: 9
+- attacks:
+  - 尖刺抽打
+  - 荆棘爆发
+  damage: 11
+  defense: 2
+  desc: 长满倒刺的藤蔓怪，受伤后会更加狂暴。
+  friendly: false
+  habitats:
+  - wild
+  - forest
+  health: 48
+  id: thorn_vine
+  materials:
+  - vine_fiber
+  name: 荆棘怪
+  phase: 2
+  skills:
+  - thorn_burst
+  weight: 7
+- attacks: []
+  damage: 0
+  defense: 0
+  desc: 在药草地附近游荡的小小光点，似乎会指引人找到有用的植物。
+  friendly: true
+  habitats:
+  - rural
+  - wild
+  - forest
+  health: 16
+  id: herb_wisp
+  materials: []
+  name: 药草精
+  phase: 2
+  skills: []
+  weight: 4
+- attacks: []
+  damage: 0
+  defense: 0
+  desc: 还活着的科研人员，谈起灵和法时会暂时忘记恐惧。
+  friendly: true
+  habitats:
+  - city
+  - research
+  - facility
+  - lab
+  health: 25
+  id: researcher
+  human: true
+  brain: true
+  materials: []
+  name: 研究员
+  phase: 2
+  skills: []
+  weight: 3
+- attacks:
+  - 枪托砸击
+  - 短点射
+  damage: 11
+  defense: 2
+  desc: 守着检查站却不再服从命令的士兵，认为所有靠近的人都想抢补给。
+  friendly: false
+  habitats:
+  - military
+  - facility
+  health: 45
+  id: deserter
+  human: true
+  brain: true
+  materials:
+  - scrap
+  name: 逃兵
+  phase: 2
+  skills: []
+  weight: 4
+- attacks:
+  - 穿身寒意
+  - 魂啸
+  damage: 12
+  defense: 3
+  desc: 人死后留下的意识残响，没有清晰的目的，只有未完成的执念。
+  friendly: false
+  habitats:
+  - city
+  - rural
+  - wild
+  - facility
+  health: 30
+  id: ghost
+  materials:
+  - ghost_essence
+  name: 魂魄
+  phase: 3
+  skills:
+  - soul_wail
+  weight: 6
+- attacks:
+  - 摄魂
+  - 撕咬
+  damage: 13
+  defense: 2
+  desc: 僵尸里重新亮起眼睛的那一类，有意识，也有智能。
+  friendly: false
+  habitats:
+  - city
+  - rural
+  - facility
+  health: 55
+  id: soul_zombie
+  brain: true
+  materials:
+  - zombie_tissue
+  - soul_dust
+  name: 有魂尸
+  phase: 3
+  skills:
+  - soul_drain
+  weight: 7
+- attacks: []
+  damage: 0
+  defense: 1
+  desc: 开始能用意识控制法的人类，愿意交流，也愿意展示一点技巧。
+  friendly: true
+  habitats:
+  - city
+  - rural
+  - camp
+  health: 40
+  id: awakened_human
+  human: true
+  brain: true
+  materials: []
+  name: 觉醒者
+  phase: 3
+  skills: []
+  weight: 4
+- attacks:
+  - 法术轰击
+  - 短刃突刺
+  damage: 12
+  defense: 2
+  desc: 把法当作新武器的掠夺者，已经不再把普通人当作同类。
+  friendly: false
+  habitats:
+  - city
+  - rural
+  - research
+  health: 50
+  id: mage_raider
+  human: true
+  brain: true
+  materials:
+  - soul_dust
+  name: 法徒
+  phase: 3
+  skills:
+  - magic_bolt
+  weight: 6
+- attacks:
+  - 灵能推击
+  - 近身压制
+  damage: 10
+  defense: 2
+  desc: 用思想追踪猎物的杀手，靠近时太阳穴会隐隐作痛。
+  friendly: false
+  habitats:
+  - city
+  - rural
+  - wild
+  health: 46
+  id: psychic_hunter
+  human: true
+  brain: true
+  materials:
+  - distortion_crystal
+  name: 灵猎手
+  phase: 3
+  skills:
+  - psychic_push
+  weight: 6
+- attacks:
+  - 吞没
+  - 酸液喷吐
+  - 分裂冲锋
+  damage: 15
+  defense: 3
+  desc: 吞并了无数分裂体的巨大黏液团，内部能看到尚未溶解的轮廓。
+  friendly: false
+  habitats:
+  - facility
+  - quarry
+  health: 80
+  id: slime_king
+  materials:
+  - slime_sample
+  - distortion_crystal
+  name: 黏液之王
+  phase: 4
+  skills:
+  - slime_split
+  - acid_spit
+  weight: 3
+- attacks:
+  - 多方向缠绕
+  - 重击
+  - 拖拽
+  damage: 18
+  defense: 4
+  desc: 触手怪进一步扭曲后的形态。它会用精神攻击扰乱目标，日志只记录攻击名称。
+  friendly: false
+  habitats:
+  - facility
+  - quarry
+  health: 90
+  id: tentacle_horror
+  brain: true
+  materials:
+  - tentacle_sucker
+  - soul_dust
+  name: 触手恐魔
+  phase: 4
+  skills:
+  - tentacle_lash
+  - mind_caress
+  weight: 3
+- attacks:
+  - 根须绞杀
+  - 荆刺风暴
+  damage: 16
+  defense: 4
+  desc: 整片林地都属于同一株植物，靠近时脚下的泥土会开始移动。
+  friendly: false
+  habitats:
+  - forest
+  - wild
+  health: 85
+  id: thorn_mother
+  materials:
+  - vine_fiber
+  - distortion_crystal
+  name: 荆棘母株
+  phase: 4
+  skills:
+  - thorn_burst
+  - vine_bind
+  weight: 3
+- attacks:
+  - 碾压
+  - 吸附
+  damage: 10
+  defense: 1
+  desc: 由多具尸体融合成的团块，表面偶尔会浮现类似人脸的起伏。
+  friendly: false
+  habitats:
+  - facility
+  - lab
+  health: 65
+  id: flesh_mass
+  materials:
+  - mutated_gland
+  - zombie_tissue
+  name: 血肉团块
+  phase: 3
+  skills:
+  - acid_spit
+  weight: 2
+- attacks:
+  - 现实撕裂
+  - 空间折叠
+  - 扭曲脉冲
+  damage: 22
+  defense: 5
+  desc: 现实在某处堆积过多后形成的自我维持结构，不像是生物，却会主动攻击。
+  friendly: false
+  habitats:
+  - facility
+  - lab
+  - wild
+  health: 120
+  id: distortion_avatar
+  materials:
+  - distortion_crystal
+  - soul_dust
+  name: 扭曲化身
+  phase: 4
+  skills:
+  - distortion_pulse
+  - soul_wail
+  weight: 1
+- id: government_guard
+  human: true
+  brain: true
+  name: 政府守卫
+  phase: 1
+  health: 95
+  damage: 18
+  defense: 6
+  habitats:
+  - guard
+  attacks:
+  - 制式点射
+  - 盾牌撞击
+  skills: []
+  materials:
+  - kevlar_vest
+  - scrap
+  friendly: false
+  weight: 1
+  desc: 装备齐全的守卫，受命封锁设施。正面冲突几乎没有胜算。
+- id: rioter
+  human: true
+  brain: true
+  name: 暴民
+  phase: 3
+  health: 42
+  damage: 11
+  defense: 1
+  habitats:
+  - city
+  - rural
+  - store
+  - home
+  attacks:
+  - 投掷杂物
+  - 棍棒围殴
+  - 推挤踩踏
+  skills: []
+  materials:
+  - scrap
+  friendly: false
+  weight: 6
+  desc: 秩序崩溃后聚集起来的人群，在拥堵与感染中变得焦躁而危险。
+- id: glow_moss
+  name: 荧光苔
+  phase: 3
+  health: 14
+  damage: 2
+  defense: 0
+  habitats:
+  - rural
+  - wild
+  - forest
+  attacks:
+  - 光斑灼痛
+  - 黏附
+  skills: []
+  materials:
+  - mutant_spore
+  friendly: false
+  weight: 9
+  desc: 一小片会移动的荧光苔藓，被踩到时会渗出带灼热感的汁液。
+- id: snap_fern
+  name: 捕蝇蕨
+  phase: 3
+  health: 26
+  damage: 6
+  defense: 0
+  habitats:
+  - rural
+  - wild
+  - forest
+  attacks:
+  - 叶片合拢
+  - 根部拖拽
+  skills:
+  - vine_bind
+  materials:
+  - vine_fiber
+  friendly: false
+  weight: 8
+  desc: 只有齐膝高的蕨类，叶片边缘长着细齿，会为靠近的动物合拢。
+- id: spore_pod
+  name: 孢囊菇
+  phase: 3
+  health: 22
+  damage: 5
+  defense: 0
+  habitats:
+  - facility
+  - forest
+  - quarry
+  attacks:
+  - 孢子喷射
+  - 酸液滴落
+  skills:
+  - acid_spit
+  materials:
+  - mutant_spore
+  friendly: false
+  weight: 7
+  desc: 伞盖已经裂开的菌类，受惊时会喷出大片让人喉咙发紧的孢子。
+- id: seed_walker
+  name: 种子行者
+  phase: 3
+  health: 32
+  damage: 7
+  defense: 1
+  habitats:
+  - rural
+  - forest
+  - wild
+  attacks:
+  - 根须抽打
+  - 种子弹射
+  skills:
+  - thorn_burst
+  materials:
+  - vine_fiber
+  - mutant_spore
+  friendly: false
+  weight: 6
+  desc: 用许多细根行走的球状植物，内部塞满了等待萌发的种子。
+- id: two_head_crow
+  name: 双头乌鸦
+  phase: 3
+  health: 16
+  damage: 4
+  defense: 0
+  habitats:
+  - city
+  - rural
+  - wild
+  - forest
+  attacks:
+  - 俯冲啄击
+  - 双声噪鸣
+  skills: []
+  materials:
+  - animal_bone
+  friendly: false
+  weight: 8
+  desc: 两个头偶尔朝不同方向张望，叫声像两种鸟叠在一起。
+- id: seven_leg_hare
+  name: 七足兔
+  phase: 3
+  health: 20
+  damage: 5
+  defense: 0
+  habitats:
+  - rural
+  - wild
+  - forest
+  attacks:
+  - 乱蹬
+  - 高速冲撞
+  skills: []
+  materials:
+  - animal_bone
+  - mutated_gland
+  friendly: false
+  weight: 7
+  desc: 多出来的三条腿没有完全长好，跑起来却快得不自然。
+- id: glass_raccoon
+  name: 玻璃浣熊
+  phase: 3
+  health: 28
+  damage: 7
+  defense: 1
+  habitats:
+  - city
+  - rural
+  - store
+  - home
+  attacks:
+  - 抓挠
+  - 翻找投掷
+  skills: []
+  materials:
+  - chitin_plate
+  friendly: false
+  weight: 5
+  desc: 背部的毛发变成了半透明薄片，翻垃圾桶时会发出玻璃碰撞般的声响。
+- id: whisper_moth
+  name: 低语蛾
+  phase: 3
+  health: 12
+  damage: 3
+  defense: 0
+  habitats:
+  - city
+  - rural
+  - wild
+  - facility
+  attacks:
+  - 鳞粉
+  - 贴面低语
+  skills:
+  - mind_caress
+  materials:
+  - mutant_spore
+  friendly: false
+  weight: 6
+  desc: 翅面上的纹路像一张不断开合的嘴，飞过时会留下轻微耳鸣。
+- id: mage_lord
+  name: 法主
+  phase: 4
+  health: 95
+  damage: 19
+  defense: 4
+  habitats:
+  - city
+  - research
+  - facility
+  attacks:
+  - 法杖横扫
+  - 符文轰击
+  skills:
+  - magic_bolt
+  - distortion_pulse
+  materials:
+  - soul_dust
+  - free_magic
+  - magic_staff
+  friendly: false
+  weight: 2
+  human: true
+  brain: true
+  desc: 已经把人形当作临时容器的施法者，会在战斗中途换一种声音说话。
+- id: law_eater
+  name: 食法者
+  phase: 4
+  health: 120
+  damage: 21
+  defense: 5
+  habitats:
+  - facility
+  - lab
+  - wild
+  attacks:
+  - 吞噬法流
+  - 空间挤压
+  skills:
+  - distortion_pulse
+  materials:
+  - free_magic
+  - distortion_crystal
+  friendly: false
+  weight: 2
+  brain: true
+  desc: 以游离之法为食的捕食者，靠近时会让附近法器短暂失去光泽。
+- id: void_hound
+  name: 虚空猎犬
+  phase: 4
+  health: 78
+  damage: 16
+  defense: 2
+  habitats:
+  - wild
+  - forest
+  - quarry
+  attacks:
+  - 短距闪现
+  - 撕咬
+  skills: []
+  materials:
+  - mutated_gland
+  - free_magic
+  friendly: false
+  weight: 4
+  brain: true
+  desc: 轮廓像被墨水晕开的犬科动物，扑击前会从视野里消失一瞬。
+- id: reality_bloom
+  name: 现实之花
+  phase: 4
+  health: 105
+  damage: 18
+  defense: 3
+  habitats:
+  - forest
+  - wild
+  - facility
+  attacks:
+  - 花瓣切割
+  - 现实根须
+  skills:
+  - thorn_burst
+  materials:
+  - free_magic
+  - distortion_crystal
+  - vine_fiber
+  friendly: false
+  weight: 2
+  desc: 花瓣边缘会映出不属于此地的景象，根系扎进现实而不是土壤。
+- id: soul_colossus
+  name: 魂骸巨像
+  phase: 4
+  health: 160
+  damage: 25
+  defense: 6
+  habitats:
+  - facility
+  - lab
+  - checkpoint
+  attacks:
+  - 魂压
+  - 骨臂横扫
+  skills:
+  - soul_wail
+  - soul_drain
+  materials:
+  - soul_dust
+  - ghost_essence
+  friendly: false
+  weight: 1
+  desc: 由许多残念黏合而成的巨大人形，移动时能听见成百上千句未说完的话。
+- id: free_magic_wisp
+  name: 游离法灵
+  phase: 4
+  health: 20
+  damage: 0
+  defense: 0
+  habitats:
+  - city
+  - rural
+  - wild
+  - facility
+  - forest
+  attacks: []
+  skills: []
+  materials: []
+  friendly: true
+  weight: 4
+  desc: 一团没有固定形态的法，靠近时会绕着人的手指打转，像是在确认什么。

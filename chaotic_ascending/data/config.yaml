@@ -1,0 +1,63 @@
+version: 4
+start_distortion: 0.0
+distortion_increment: 1.0
+distortion_acceleration: 0.01
+phase_two: 0.669
+phase_three: 77.5
+phase_four: 341.0
+search_minutes: 15
+travel_minutes: 10
+rest_minutes: 60
+care_minutes: 5
+network_minutes: 60
+infiltrate_minutes: 120
+start_clock_minutes: 480
+tick_ms: 120
+autosave_turns: 20
+log_limit: 800
+player:
+  max_health: 100
+  strength: 3
+  agility: 3
+  will: 3
+  perception: 3
+  start_food: 3
+  start_water: 3
+  start_medicine: 2
+  start_herbs: 0
+  start_scrap: 0
+needs:
+  hunger_per_hour: 3.2
+  fatigue_per_hour: 2.2
+  thirst_per_hour: 3.8
+  hunger_threshold: 70
+  fatigue_threshold: 85
+  thirst_threshold: 75
+  rest_fatigue: 45
+  rest_health: 8
+  starvation_damage: 1
+  exhaustion_damage: 1
+  dehydration_damage: 1
+  infection_per_hit: 6
+  bladder_per_hour: 4.0
+  bowel_per_hour: 2.0
+  bowel_threshold: 78
+combat:
+  base_attack: 4
+  strength_attack: 3
+  defense_scale: 1.0
+  flee_base: 35
+  flee_agility: 10
+  skill_damage_scale: 1.0
+  strong_health: 60
+  strong_damage: 14
+auto:
+  heal_below: 52
+  flee_below: 28
+  rest_fatigue: 60
+  eat_hunger: 50
+  drink_thirst: 48
+  cure_infection: 30
+  toilet_bladder: 55
+  toilet_bowel: 55
+  spell_chance: 55

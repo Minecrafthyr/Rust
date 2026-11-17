@@ -1,8 +1,8 @@
 use crate::{
-  content::{LootEntry, RestockHint, SiteDef},
+  content::{RestockHint, SiteDef},
   model::{
-    rng::{Rng, weighted_index},
-    sim::{Approach, Sim},
+    rng::Rng,
+    sim::{Approach, Sim, fnv1a, weighted_pick},
     time::{DS_PER_DAY, DS_PER_HOUR, minutes_to_ds},
     world::{Detention, LogCategory, Pursuit, Severity},
   },
@@ -271,7 +271,7 @@ impl Sim {
       format!("你被按倒在地，赃物全部没收。你将被拘留到第 {until_day} 天，从看守所离开。"),
     );
     self.note(format!("被拘留：第 {until_day} 天获释"));
-    self.record_chronicle(
+    self.record_event(
       Severity::Critical,
       format!("在第 {} 天因偷窃被拘留，第 {} 天离开看守所。", self.day(), until_day),
     );
@@ -311,7 +311,7 @@ impl Sim {
       format!("第二天，你离开看守所。{}，赃物已被没收。", detention.reason),
     );
     self.note("拘留结束");
-    self.record_chronicle(
+    self.record_event(
       Severity::Important,
       format!("第 {} 天离开看守所，结束了这次拘留。", self.day()),
     );
@@ -412,19 +412,4 @@ impl Sim {
       self.archive.mark_restock_known(&def.id);
     }
   }
-}
-
-fn weighted_pick<'a>(rng: &mut Rng, entries: &'a [LootEntry]) -> Option<&'a LootEntry> {
-  let weights = entries.iter().map(|entry| entry.weight.max(1)).collect::<Vec<_>>();
-  let index = weighted_index(rng, &weights);
-  entries.get(index)
-}
-
-fn fnv1a(bytes: &[u8]) -> u64 {
-  let mut hash = 0xcbf2_9ce4_8422_2325_u64;
-  for &byte in bytes {
-    hash ^= u64::from(byte);
-    hash = hash.wrapping_mul(0x0000_0100_0000_01b3);
-  }
-  hash
 }

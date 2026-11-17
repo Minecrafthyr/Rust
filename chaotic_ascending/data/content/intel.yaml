@@ -1,0 +1,225 @@
+intel:
+- id: research_id_card_intel
+  title: 带红条纹的员工卡
+  category: identity
+  importance: critical
+  phase: 2
+  content: |-
+    一张碧落研究园区员工“林澄”的身份卡，上面有红色的条纹。
+    卡号 BR-7719-04，门禁等级 B2。
+  fake: false
+  ambiguous: false
+- id: tourist_map
+  title: 旅游地图
+  category: map
+  importance: low
+  phase: 1
+  content: |-
+    一张旅游地图，上面标记了适合旅客前往的景点和店铺。
+    背面用铅笔画了几个圈，像是有人提前标过路线。
+  fake: false
+  ambiguous: false
+- id: military_map
+  title: 军需仓库地图
+  category: map
+  importance: critical
+  phase: 2
+  target_site: bunker
+  content: |-
+    一张粗略的地图，用 X 标记了军需仓库，并标记了一条前往那里的道路。
+    图的边缘写着：“不要从正门进。”
+  fake: false
+  ambiguous: false
+- id: lab_password_note
+  title: 数据库密码纸条
+  category: note
+  importance: critical
+  phase: 2
+  target_site: bunker
+  content: |-
+    一张写着“SABLE-7-ECHO”密码的纸，用于解锁地下实验室服务器机房的电脑。
+    纸角有咖啡渍，背面画着服务器的位置。
+  fake: false
+  ambiguous: false
+- id: game_progress_note
+  title: 某人的游戏进程
+  category: note
+  importance: low
+  phase: 1
+  content: |-
+    一张纸，上面写着某人的游戏进程：第四章、存档点 11、支线还差两个。
+    世界都这样了，他居然还在玩。
+  fake: false
+  ambiguous: false
+- id: zombie_weakness_announcement
+  title: 州政府丧尸通告
+  category: network
+  importance: high
+  phase: 2
+  content: |-
+    州政府提示丧尸怕火和强光，改装气罐或火把可拖慢丧尸速度，燃烧弹、燃烧瓶也能对丧尸造成伤害。
+    公告最后一行小字：不要试图与感染者交谈。
+  fake: false
+  ambiguous: false
+- id: sewer_sound_rumor
+  title: 地下水道里的回声
+  category: rumor
+  importance: normal
+  phase: 1
+  target_site: subway
+  content: |-
+    某处的地下水道里有回荡的声响。
+    他说不清具体是哪一段，只记得声音像有人在敲铁管。
+  fake: false
+  ambiguous: true
+- id: fake_bunker_cache
+  title: 地下实验室备用物资
+  category: rumor
+  importance: high
+  phase: 2
+  target_site: bunker
+  content: |-
+    有人信誓旦旦地说，地下实验室 B3 层还有一整套备用物资，只要弄到身份卡和密码就能拿走。
+    他说这话时一直没看你的眼睛。
+  fake: true
+  ambiguous: true
+- id: supermarket_stock_rumor
+  title: 港湾超市的冷库
+  category: rumor
+  importance: normal
+  phase: 1
+  target_site: boston_supermarket
+  content: |-
+    王婶说港湾超市的冷库还能打开，里面至少还有几箱牛奶和冻肉。
+    她只进去过一次，没走到最里面。
+  fake: false
+  ambiguous: true
+- id: school_shelter_rumor
+  title: 学校体育馆的临时安置点
+  category: rumor
+  importance: normal
+  phase: 1
+  target_site: boston_school
+  content: |-
+    你听人提起，学校的体育馆被改成了临时安置点，那里每天都会发一次救济粮。
+    对方不确定发放还会持续多久。
+  fake: false
+  ambiguous: true
+- id: burned_convoy_map
+  title: 烧毁的车队路线
+  category: map
+  importance: normal
+  phase: 2
+  target_site: quarry
+  content: |-
+    一张被火烧掉大半的运输路线图，残存部分指向废弃采石场。
+    图上的押运编号被人用刀划掉了。
+  fake: true
+  ambiguous: true
+- id: sewer_access_note
+  title: 地铁检修口纸条
+  category: note
+  importance: normal
+  phase: 2
+  content: 一张地铁检修口的便条，写着“B 口第三个通风井能下到隧道”，后面还有一串值班表。
+  fake: false
+  ambiguous: false
+- id: instrument_drift_news
+  title: 仪器误差通告
+  category: network
+  importance: high
+  phase: 1
+  content: |-
+    多台精密仪器同时出现无法校准的误差，引力波观测站记录到数次短暂的时空震荡。
+    官方通报称这是设备老化与宇宙噪声，但同一时段的值班记录被统一收回。
+  fake: false
+  ambiguous: false
+  news_for: instrument_drift
+- id: stray_signals_news
+  title: 射电望远镜杂讯
+  category: network
+  importance: high
+  phase: 1
+  content: |-
+    射电望远镜在多个频段收到重复的无规律信号，来源无法定位。
+    观测记录被列为内部资料，对外只说是“仪器杂讯”。
+  fake: false
+  ambiguous: false
+  news_for: stray_signals
+- id: outbreak_news
+  title: 丧尸病毒爆发
+  category: network
+  importance: critical
+  phase: 2
+  content: |-
+    州卫生部门确认一种经体液与撕咬传播的病毒在人口密集区爆发。
+    感染者失去思维，被咬伤的人也会在数小时内转化。请远离人群并等待进一步通知。
+  fake: false
+  ambiguous: false
+  news_for: outbreak
+- id: psychic_magic_news
+  title: 灵与法的发现
+  category: network
+  importance: high
+  phase: 2
+  content: |-
+    多所研究机构在感染者与异常生物身上检测到两种未知能量，暂定名为「灵」与「法」。
+    相关样本已被转移至碧落研究园区。
+  fake: false
+  ambiguous: false
+  news_for: psychic_and_magic
+- id: quarantine_news
+  title: 主干道封锁通告
+  category: network
+  importance: high
+  phase: 2
+  content: |-
+    通往新英格兰以外的主干道已被封锁，所有车辆与行人须在检查站接受盘查。
+    广播反复强调这是临时措施，但路障与哨塔在持续加固。
+  fake: false
+  ambiguous: false
+  news_for: quarantine
+- id: blackout_news
+  title: 大停电快讯
+  category: network
+  importance: critical
+  phase: 3
+  content: |-
+    电网在数小时内大面积崩溃，交通信号与通信网络相继失常。
+    解药运输改为直升机投放，许多偏远地区已无法确认是否还有下一班。
+  fake: false
+  ambiguous: false
+  news_for: blackout
+- id: soul_news
+  title: 人工智能服务器中的魂
+  category: network
+  importance: critical
+  phase: 3
+  content: |-
+    一台仍在运行的人工智能服务器核心中检测到被称作「魂」的残留。
+    研究者据此推测，人类特有的意识控制能力同样来源于魂。
+  fake: false
+  ambiguous: false
+  news_for: soul_in_the_machine
+- id: order_collapse_news
+  title: 政府机构撤离
+  category: network
+  importance: critical
+  phase: 3
+  content: |-
+    政府机构陆续撤离，职业守卫接管了机密地点与检查站。
+    幸存者开始依附营地、农场与零散救济点，自行决定如何活下去。
+  fake: false
+  ambiguous: false
+  news_for: order_collapse
+- id: alternate_space_news
+  title: 折叠街区的目击报告
+  category: network
+  importance: critical
+  phase: 4
+  content: |-
+    多地报告看到街道、建筑与天空像纸一样折叠，目击者称可以走进去。
+    这些区域无法用现有地图定位，进入者的记录只留下互相矛盾的描述。
+  fake: false
+  ambiguous: false
+  news_for: alternate_space

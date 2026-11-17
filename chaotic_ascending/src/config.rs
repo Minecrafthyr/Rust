@@ -30,15 +30,15 @@ impl Paths {
     Ok(())
   }
 
-  pub fn config(&self) -> PathBuf { self.root.join("config.json5") }
+  pub fn config(&self) -> PathBuf { self.root.join("config.yaml") }
 
-  /// Directory containing any number of `*.json5` content patches.
+  /// Directory containing any number of `*.yaml` content patches.
   pub fn content_dir(&self) -> PathBuf { self.root.join("content") }
 
   /// Pre-split format kept as a read-only migration fallback.
-  pub fn legacy_content(&self) -> PathBuf { self.root.join("content.json5") }
+  pub fn legacy_content(&self) -> PathBuf { self.root.join("content.yaml") }
 
-  pub fn titles(&self) -> PathBuf { self.root.join("titles.json5") }
+  pub fn titles(&self) -> PathBuf { self.root.join("titles.yaml") }
 
   pub fn content_cache(&self) -> PathBuf { self.root.join("cache/content.bin") }
 
@@ -315,38 +315,50 @@ pub fn load_or_create(paths: &Paths) -> Result<Config, Box<dyn std::error::Error
   let path = paths.config();
   if !path.exists() {
     let config = Config::default();
-    fs::write(&path, serde_json::to_string_pretty(&config)?)?;
+    fs::write(&path, yaml(&config)?)?;
     return Ok(config);
   }
   let source = fs::read_to_string(&path)?;
   let mut config: Config =
-    json5::from_str(&source).map_err(|error| format!("解析 {} 失败：{error}", path.display()))?;
+    parse(&source).map_err(|error| format!("解析 {} 失败：{error}", path.display()))?;
   config.sanitize();
   Ok(config)
 }
 
 pub fn save(paths: &Paths, config: &Config) -> Result<(), Box<dyn std::error::Error>> {
   paths.ensure()?;
-  fs::write(paths.config(), serde_json::to_string_pretty(config)?)?;
+  fs::write(paths.config(), yaml(config)?)?;
   Ok(())
 }
 
-const DEFAULT_CONTENT_FILES: [(&str, &str); 8] = [
-  ("creatures.json5", include_str!("../data/content/creatures.json5")),
-  ("intel.json5", include_str!("../data/content/intel.json5")),
-  ("items.json5", include_str!("../data/content/items.json5")),
-  ("items_expanded.json5", include_str!("../data/content/items_expanded.json5")),
-  ("npcs.json5", include_str!("../data/content/npcs.json5")),
-  ("sites.json5", include_str!("../data/content/sites.json5")),
-  ("skills.json5", include_str!("../data/content/skills.json5")),
-  ("weaknesses.json5", include_str!("../data/content/weaknesses.json5")),
+/// Parses a YAML document. Every data file in `data/` uses this one entry point, so error
+/// messages from `serde_saphyr` (line/column plus a source snippet) stay consistent.
+pub fn parse<T: serde::de::DeserializeOwned>(source: &str) -> Result<T, serde_saphyr::Error> {
+  serde_saphyr::from_str(source)
+}
+
+/// Serialises `value` as a YAML document, used whenever the game writes a data file itself.
+pub fn yaml<T: Serialize>(value: &T) -> Result<String, serde_saphyr::SerializeError> {
+  serde_saphyr::to_string(value)
+}
+
+const DEFAULT_CONTENT_FILES: [(&str, &str); 9] = [
+  ("creatures.yaml", include_str!("../data/content/creatures.yaml")),
+  ("history.yaml", include_str!("../data/content/history.yaml")),
+  ("intel.yaml", include_str!("../data/content/intel.yaml")),
+  ("items.yaml", include_str!("../data/content/items.yaml")),
+  ("items_expanded.yaml", include_str!("../data/content/items_expanded.yaml")),
+  ("npcs.yaml", include_str!("../data/content/npcs.yaml")),
+  ("sites.yaml", include_str!("../data/content/sites.yaml")),
+  ("skills.yaml", include_str!("../data/content/skills.yaml")),
+  ("weaknesses.yaml", include_str!("../data/content/weaknesses.yaml")),
 ];
 
-/// Loads all JSON5 content patches, using a binary cache keyed by every source file.
+/// Loads all YAML content patches, using a binary cache keyed by every source file.
 ///
-/// The default layout is `data/content/{creatures,items,sites,skills}.json5`, but every
-/// `*.json5` file in that directory is read. Each file may define any subset of the four sections,
-/// so a mod can add one creature without copying the whole bestiary.
+/// The default layout is `data/content/{creatures,items,sites,skills}.yaml`, but every
+/// `*.yaml`/`*.yml` file in that directory is read. Each file may define any subset of the four
+/// sections, so a mod can add one creature without copying the whole bestiary.
 pub fn load_content(paths: &Paths) -> Result<super::content::Content, Box<dyn std::error::Error>> {
   paths.ensure()?;
   let sources = content_sources(paths)?;
@@ -364,7 +376,7 @@ pub fn load_content(paths: &Paths) -> Result<super::content::Content, Box<dyn st
   let mut content = super::content::Content::default();
   for (path, source) in &sources {
     let patch: super::content::ContentPatch =
-      json5::from_str(source).map_err(|error| format!("解析 {} 失败：{error}", path.display()))?;
+      parse(source).map_err(|error| format!("解析 {} 失败：{error}", path.display()))?;
     content.merge(patch);
   }
   content.validate()?;
@@ -401,7 +413,9 @@ fn content_files(directory: &std::path::Path) -> Result<Vec<PathBuf>, std::io::E
     .flatten()
     .filter(|entry| entry.file_type().is_ok_and(|kind| kind.is_file()))
     .map(|entry| entry.path())
-    .filter(|path| path.extension().is_some_and(|extension| extension == "json5"))
+    .filter(|path| {
+      path.extension().is_some_and(|extension| extension == "yaml" || extension == "yml")
+    })
     .collect::<Vec<_>>();
   files.sort();
   Ok(files)
@@ -482,27 +496,70 @@ mod tests {
     let first = load_content(&paths).unwrap();
     assert!(first.sites.len() >= 26);
     for name in [
-      "creatures.json5",
-      "intel.json5",
-      "items.json5",
-      "items_expanded.json5",
-      "npcs.json5",
-      "sites.json5",
-      "skills.json5",
-      "weaknesses.json5",
+      "creatures.yaml",
+      "history.yaml",
+      "intel.yaml",
+      "items.yaml",
+      "items_expanded.yaml",
+      "npcs.yaml",
+      "sites.yaml",
+      "skills.yaml",
+      "weaknesses.yaml",
     ] {
       assert!(paths.content_dir().join(name).exists());
     }
 
-    let extra = paths.content_dir().join("extra.json5");
+    let extra = paths.content_dir().join("extra.yaml");
     fs::write(
       &extra,
-      r#"{ items: [{ id: "test_item", name: "测试物品", kind: "material", phase: 1, desc: "cache test" }] }"#,
+      r#"items:
+  - id: test_item
+    name: 测试物品
+    kind: material
+    phase: 1
+    desc: cache test
+"#,
     )
     .unwrap();
     let second = load_content(&paths).unwrap();
     assert!(second.items.iter().any(|item| item.id == "test_item"));
     assert_eq!(second.items.len(), first.items.len() + 1);
+
+    // A `.yml` file is picked up as well, and the `.yaml` edit above must invalidate the cache.
+    let yml = paths.content_dir().join("extra_yml.yml");
+    fs::write(
+      &yml,
+      r#"items:
+  - id: yml_item
+    name: YAML 物品
+    kind: material
+    phase: 1
+    desc: extension test
+"#,
+    )
+    .unwrap();
+    let third = load_content(&paths).unwrap();
+    assert!(third.items.iter().any(|item| item.id == "yml_item"));
+    let _ = fs::remove_dir_all(&root);
+  }
+
+  #[test]
+  fn config_written_as_yaml_round_trips() {
+    let root = std::env::temp_dir()
+      .join(format!("chaotic_ascending_yaml_config_test_{}", std::process::id()));
+    let _ = fs::remove_dir_all(&root);
+    let paths = Paths { root: root.clone() };
+
+    let created = load_or_create(&paths).unwrap();
+    let source = fs::read_to_string(paths.config()).unwrap();
+    assert!(source.contains("phase_two:"), "config 应当是 YAML：{source}");
+    assert!(!source.trim_start().starts_with('{'));
+    assert_eq!(crate::config::parse::<Config>(&source).unwrap().phase_two, created.phase_two);
+
+    let mut edited = created.clone();
+    edited.tick_ms = 250;
+    save(&paths, &edited).unwrap();
+    assert_eq!(load_or_create(&paths).unwrap().tick_ms, 250);
     let _ = fs::remove_dir_all(&root);
   }
 }

@@ -1,14 +1,6 @@
-use std::error::Error;
+use std::fmt::Write as _;
 
-use crossterm::event::{Event, KeyCode, KeyEvent, read};
-
-use crate::{
-  model::{ManualAction, Sim},
-  ui::{
-    App,
-    game::{Mode, draw_main},
-  },
-};
+use crate::model::Sim;
 
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub(super) enum CombatTab {
@@ -69,18 +61,18 @@ impl CombatPanel {
     }
   }
 
-  fn switch(&mut self, tab: CombatTab) {
+  pub(super) fn switch(&mut self, tab: CombatTab) {
     self.tab = tab;
     self.index = 0;
   }
 
-  fn clamp(&mut self, sim: &Sim) {
+  pub(super) fn clamp(&mut self, sim: &Sim) {
     let len = self.entries(sim).len();
     self.index = self.index.min(len.saturating_sub(1));
   }
 
   /// Draw the bottom half of the combat screen.
-  pub(super) fn lines(&self, sim: &Sim, height: usize) -> Vec<String> {
+  pub(super) fn text(&self, sim: &Sim, height: usize) -> String {
     let entries = self.entries(sim);
     let tabs = [(CombatTab::Attack, "攻击"), (CombatTab::Skill, "施法"), (CombatTab::Item, "道具")]
       .into_iter()
@@ -88,74 +80,24 @@ impl CombatPanel {
       .collect::<Vec<_>>()
       .join(" ");
     let selected = self.index.min(entries.len().saturating_sub(1));
-    let mut lines = vec![format!("行动  {tabs}")];
+    let mut text = String::new();
+    writeln!(text, "行动  {tabs}").unwrap();
     let visible = height.saturating_sub(3).max(1);
     if entries.is_empty() {
-      lines.push("（无可用行动）".to_string());
+      writeln!(text, "（无可用行动）").unwrap();
     } else {
       let start = selected.saturating_sub(visible.saturating_sub(1));
       for (index, (label, _)) in entries.iter().enumerate().skip(start).take(visible) {
-        lines.push(if index == selected { format!("> {label}") } else { format!("  {label}") });
+        let marker = if index == selected { ">" } else { " " };
+        writeln!(text, "{marker} {label}").unwrap();
       }
     }
-    lines.push("[←/→]切换  [↑/↓]选择  [Enter]执行  [F]逃跑".to_string());
-    lines
+    writeln!(text, "[←/→]切换  [↑/↓]选择  [Enter]执行  [F]逃跑").unwrap();
+    text
   }
 
-  fn action(&self, sim: &Sim) -> Option<CombatAction> {
+  pub(super) fn action(&self, sim: &Sim) -> Option<CombatAction> {
     self.entries(sim).get(self.index).map(|(_, action)| action.clone())
-  }
-}
-
-impl App {
-  /// Combat is a dedicated layout: logs on the upper half, action panel on the lower half.
-  pub(super) fn combat_loop(
-    &mut self, sim: &mut Sim, panel: &mut CombatPanel, mode: Mode, auto: bool, tick_ms: u64,
-  ) -> Result<CombatExit, Box<dyn Error>> {
-    loop {
-      panel.clamp(sim);
-      draw_main(sim, mode, auto, tick_ms, &self.log_filter, 0, Some(panel))?;
-      let Event::Key(KeyEvent { code, kind, .. }) = read()? else {
-        continue;
-      };
-      if !kind.is_press() {
-        continue;
-      }
-      match code {
-      KeyCode::Char('q') => {
-        let _ = sim.save();
-        let _ = sim.save_archive();
-        self.archive = sim.archive.clone();
-        return Ok(CombatExit::Quit);
-      }
-      KeyCode::Left | KeyCode::Char('a') => panel.switch(CombatTab::Attack),
-      KeyCode::Right | KeyCode::Char('s') => panel.switch(CombatTab::Skill),
-      KeyCode::Char('i') => panel.switch(CombatTab::Item),
-      KeyCode::Up => panel.index = panel.index.saturating_sub(1),
-      KeyCode::Down => panel.index = panel.index.saturating_add(1),
-      KeyCode::Enter =>
-        if let Some(action) = panel.action(sim) {
-          let acted = match action {
-          CombatAction::Attack => sim.manual(ManualAction::Attack),
-          CombatAction::Skill(id) => sim.manual_cast(&id),
-          CombatAction::Item(id) => sim.manual_use_item(&id),
-          };
-          if !acted {
-            continue;
-          }
-          if sim.state.world.enemy.is_none() || sim.state.world.ended {
-            return Ok(CombatExit::Done);
-          }
-        },
-      KeyCode::Char('f') | KeyCode::Esc => {
-        sim.manual(ManualAction::Flee);
-        if sim.state.world.enemy.is_none() || sim.state.world.ended {
-          return Ok(CombatExit::Done);
-        }
-      }
-      _ => {}
-      }
-    }
   }
 }
 
@@ -171,12 +113,12 @@ mod tests {
   fn sim_with_skill() -> Sim {
     let mut content = Content::default();
     for source in [
-      include_str!("../../data/content/skills.json5"),
-      include_str!("../../data/content/items.json5"),
-      include_str!("../../data/content/creatures.json5"),
-      include_str!("../../data/content/sites.json5"),
+      include_str!("../../data/content/skills.yaml"),
+      include_str!("../../data/content/items.yaml"),
+      include_str!("../../data/content/creatures.yaml"),
+      include_str!("../../data/content/sites.yaml"),
     ] {
-      let patch: ContentPatch = json5::from_str(source).unwrap();
+      let patch: ContentPatch = crate::config::parse(source).unwrap();
       content.merge(patch);
     }
     let mut archive = Archive { awareness: true, ..Archive::default() };
@@ -206,11 +148,11 @@ mod tests {
     let sim = sim_with_skill();
     let mut panel = CombatPanel::default();
     assert_eq!(panel.tab, CombatTab::Attack);
-    let attack = panel.lines(&sim, 10).join("\n");
+    let attack = panel.text(&sim, 10);
     assert!(attack.contains("[攻击]"));
     assert!(attack.contains("普通攻击"));
     panel.switch(CombatTab::Skill);
-    let skills = panel.lines(&sim, 10).join("\n");
+    let skills = panel.text(&sim, 10);
     assert!(skills.contains("法弹"));
     assert!(skills.contains("法"));
   }

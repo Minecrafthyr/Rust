@@ -1,0 +1,112 @@
+history:
+- id: instrument_drift
+  phase: 1
+  date: "2026-09-26 10时"
+  title: 仪器误差
+  text: |-
+    精密仪器开始出现误差，引力波记录到几次时空震荡。
+  unlock:
+  - site_tag: research
+  - intel: instrument_drift_news
+- id: stray_signals
+  phase: 1
+  date: "2026-09-26 10时"
+  title: 杂讯
+  text: |-
+    射电望远镜在多个频段收到无规律的信号。
+  unlock:
+  - site: observatory
+  - intel: stray_signals_news
+- id: outbreak
+  phase: 2
+  date: "2026-09-27 12时"
+  title: 丧尸病毒
+  text: |-
+    一种经体液与撕咬传播的病毒在人口密集区爆发。
+    感染者失去思维，只剩本能，被咬伤的人也会在不久后变成它们中的一员。
+  unlock:
+  - creature: zombie
+  - intel: outbreak_news
+- id: vaccine
+  phase: 2
+  date: "2026-10-04 4时"
+  title: 疫苗
+  text: |-
+    解剂的研制没有成功，但疫苗遏制住了病毒的扩散。
+    官方在接种点组织接种，秩序短暂地恢复了一阵。
+  unlock:
+  - site: vaccination
+  - notification
+- id: psychic_and_magic
+  phase: 2
+  date: "2026-10-15 22时"
+  title: 灵与法
+  text: |-
+    研究者在感染者与异常生物身上发现了「灵」与「法」。
+  unlock:
+  - site_tag: research
+  - intel: psychic_magic_news
+- id: quarantine
+  phase: 2
+  date: "2026-11-04 7时"
+  title: 封锁
+  text: |-
+    通往新英格兰以外的主干道被封锁。
+    广播里反复说这是临时措施，可路障一直没有撤走。
+  unlock:
+  - site_tag: blockade
+  - broadcast
+  - intel: quarantine_news
+- id: blackout
+  phase: 3
+  date: "2026-11-24 12时"
+  title: 大停电
+  text: |-
+    电网在数小时内崩溃，交通与网络随之失常。
+    解药只能靠直升机投放，很多地方再也没有等到下一班。
+  unlock:
+  - power
+  - intel: blackout_news
+- id: soul_in_the_machine
+  phase: 3
+  date: "2026-12-09 17时"
+  title: 魂
+  text: |-
+    有人在一台人工智能服务器的核心中发现了「魂」。
+    由此有人猜测，人所特有的意识控制能力也源于魂。
+  unlock:
+  - intel: soul_news
+- id: azure_project
+  phase: 3
+  date: "2026-12-24 10时"
+  title: 碧落计划
+  text: |-
+    碧落计划的研究记录，指向新英格兰山体深处的地下实验室。
+    记录在此处中断，剩下的部分被列为机密。
+  unlock:
+  - research_record
+- id: order_collapse
+  phase: 3
+  date: "2027-01-13 16时"
+  title: 秩序崩坏
+  text: |-
+    政府机构陆续撤离，职业守卫接管了机密地点。
+    幸存者依附于营地、农场与零散的救济点，开始自己决定怎么活下去。
+  unlock:
+  - intel: order_collapse_news
+- id: alternate_space
+  phase: 4
+  date: "2027-02-22"
+  title: 异空间
+  text: |-
+    扭曲不再只是仪器上的数字，而是可以被看见、被走进去的东西。
+  unlock:
+  - alternate_space
+  - intel: alternate_space_news
+- id: magic_fall
+  phase: 4
+  date: "2027-03-24"
+  title: 法入人间
+  text: |-
+    游离的「法」漂浮在空气里。
+    法晶从扭曲中诞生，第三阶段罕见的怪物成了常态。

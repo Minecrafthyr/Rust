@@ -3,7 +3,7 @@ use std::collections::BTreeMap;
 use crate::{
   content::{Content, Region, SiteDef},
   model::{
-    sim::Sim,
+    sim::{Sim, fnv1a},
     time::DS_PER_HOUR,
     world::{MapRoute, MapState, SiteState},
   },
@@ -216,13 +216,4 @@ impl Sim {
       }
     }
   }
-}
-
-fn fnv1a(bytes: &[u8]) -> u64 {
-  let mut hash = 0xcbf2_9ce4_8422_2325_u64;
-  for &byte in bytes {
-    hash ^= u64::from(byte);
-    hash = hash.wrapping_mul(0x0000_0100_0000_01b3);
-  }
-  hash
 }

@@ -7,16 +7,17 @@ use crate::{
 fn content() -> Content {
   let mut content = Content::default();
   for source in [
-    include_str!("../../data/content/creatures.json5"),
-    include_str!("../../data/content/intel.json5"),
-    include_str!("../../data/content/items.json5"),
-    include_str!("../../data/content/items_expanded.json5"),
-    include_str!("../../data/content/npcs.json5"),
-    include_str!("../../data/content/sites.json5"),
-    include_str!("../../data/content/skills.json5"),
-    include_str!("../../data/content/weaknesses.json5"),
+    include_str!("../../data/content/creatures.yaml"),
+    include_str!("../../data/content/history.yaml"),
+    include_str!("../../data/content/intel.yaml"),
+    include_str!("../../data/content/items.yaml"),
+    include_str!("../../data/content/items_expanded.yaml"),
+    include_str!("../../data/content/npcs.yaml"),
+    include_str!("../../data/content/sites.yaml"),
+    include_str!("../../data/content/skills.yaml"),
+    include_str!("../../data/content/weaknesses.yaml"),
   ] {
-    let patch: ContentPatch = json5::from_str(source).unwrap();
+    let patch: ContentPatch = crate::config::parse(source).unwrap();
     content.merge(patch);
   }
   content
@@ -674,11 +675,106 @@ fn archive_entries_keep_multiple_intel_sources() {
 }
 
 #[test]
-fn chronicle_survives_cycles_and_lists_major_events() {
+fn events_survive_cycles_and_list_major_events() {
   let mut sim = test_sim(207, Region::City);
-  sim.record_chronicle(crate::model::Severity::Critical, "测试大事");
-  assert!(sim.archive.chronicle.iter().any(|entry| entry.text == "测试大事"));
-  assert!(sim.archive.chronicle.iter().all(|entry| entry.cycle >= 1));
+  sim.record_event(crate::model::Severity::Critical, "测试大事");
+  assert!(sim.archive.events.iter().any(|entry| entry.text == "测试大事"));
+  assert!(sim.archive.events.iter().all(|entry| entry.cycle >= 1));
+}
+
+#[test]
+fn chronicle_dates_parse_into_game_clock() {
+  let at = |text| crate::model::game_date_ds(text).unwrap();
+  assert_eq!(at("2026-09-26 10时"), 10 * 3_600 * 10);
+  assert_eq!(at("2026-09-27 12时"), (86_400 + 12 * 3_600) * 10);
+  assert_eq!(at("2027-02-22"), 149 * 86_400 * 10);
+  assert_eq!(at("2027-03-24"), 179 * 86_400 * 10);
+  assert!(crate::model::game_date_ds("not a date").is_none());
+}
+
+#[test]
+fn chronicle_requires_both_the_date_and_a_condition() {
+  let mut sim = test_sim(212, Region::City);
+  assert!(!sim.archive.history_unlocked("instrument_drift"));
+
+  // Reaching a research site is not enough before the chronicle date.
+  sim.archive.unlock_site("cambridge", "剑桥大学区", "测试", 1, true);
+  sim.refresh_history();
+  assert!(!sim.archive.history_unlocked("instrument_drift"));
+
+  // The date alone is not enough either: the visited site is the condition.
+  sim.state.world.clock_ds = crate::model::game_date_ds("2026-09-26 10时").unwrap();
+  sim.refresh_history();
+  assert!(sim.archive.history_unlocked("instrument_drift"));
+  assert!(!sim.archive.history_unlocked("stray_signals"));
+}
+
+#[test]
+fn news_bulletins_reveal_the_corresponding_chronicle() {
+  let mut sim = test_sim(213, Region::City);
+  sim.state.world.clock_ds = crate::model::game_date_ds("2026-09-27 12时").unwrap();
+  assert!(sim.reveal_due_news());
+  assert!(sim.archive.intel_record("outbreak_news").is_some());
+  sim.refresh_history();
+  assert!(sim.archive.history_unlocked("outbreak"));
+}
+
+#[test]
+fn chronicle_special_conditions_use_world_milestones() {
+  let mut sim = test_sim(214, Region::City);
+  sim.state.world.clock_ds = crate::model::game_date_ds("2027-03-24").unwrap();
+  sim.refresh_history();
+  assert!(sim.archive.history_unlocked("magic_fall"));
+  assert!(!sim.archive.history_unlocked("azure_project"));
+
+  sim.archive.mark_history_flag("research_record");
+  sim.refresh_history();
+  assert!(sim.archive.history_unlocked("azure_project"));
+
+  sim.archive.mark_history_flag("broadcast");
+  sim.refresh_history();
+  assert!(sim.archive.history_unlocked("quarantine"));
+
+  sim.archive.mark_history_flag("alternate_space");
+  sim.refresh_history();
+  assert!(sim.archive.history_unlocked("alternate_space"));
+}
+
+#[test]
+fn phone_notification_unlocks_the_vaccine_chronicle() {
+  let mut sim = test_sim(215, Region::City);
+  sim.state.world.clock_ds = crate::model::game_date_ds("2026-10-04 4时").unwrap();
+  sim.refresh_history();
+  assert!(!sim.archive.history_unlocked("vaccine"));
+  sim.state.player.inventory.add(crate::model::ItemStack::new("phone", 1, 1.0));
+  sim.refresh_history();
+  assert!(sim.archive.history_unlocked("vaccine"));
+}
+
+#[test]
+fn legacy_archives_backfill_the_chronicle_by_phase() {
+  let archive = Archive { runs: 3, ..Archive::default() };
+  let sim = Sim::new(
+    "旧档案",
+    216,
+    Region::City,
+    Config::default(),
+    content(),
+    archive,
+    test_paths("legacy_history"),
+  );
+  assert!(sim.archive.history_tracking);
+  assert!(sim.archive.history_unlocked("instrument_drift"));
+  assert!(sim.archive.history_unlocked("stray_signals"));
+  assert!(!sim.archive.history_unlocked("outbreak"));
+}
+
+#[test]
+fn weakness_reports_are_not_written_into_events() {
+  let mut sim = test_sim(211, Region::City);
+  sim.state.world.distortion = 100.0;
+  assert!(sim.reveal_network_weakness());
+  assert!(sim.archive.events.iter().all(|entry| !entry.text.contains("弱点")));
 }
 
 #[test]

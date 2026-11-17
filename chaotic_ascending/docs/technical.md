@@ -8,14 +8,15 @@
 chaotic_ascending/
 ├── Cargo.toml
 ├── data/                 运行时数据、存档与缓存（部分文件首次运行生成）
-│   ├── titles.json5      标题画面与横向主菜单（按语言）
-│   ├── config.json5      全局参数（首次运行生成）
-│   ├── content/          内容补丁目录，加载全部 *.json5
+│   ├── titles.yaml      标题画面与横向主菜单（按语言）
+│   ├── config.yaml      全局参数（首次运行生成）
+│   ├── content/          内容补丁目录，加载全部 `*.yaml`
 │   ├── cache/content.bin 内容二进制缓存
 │   ├── worlds/*.bin      世界存档
 │   └── archive.bin       跨循环档案
 ├── docs/                 文档（本目录）
 ├── examples/split_content.rs
+├── scripts/json5_to_yaml.py 一次性迁移脚本：JSON5 → YAML
 └── src/
     ├── main.rs           启动、终端初始化与退出清理
     ├── lib.rs            模块导出
@@ -33,20 +34,24 @@ chaotic_ascending/
     │   ├── save.rs       世界存档读写
     │   ├── rng.rs        SplitMix64
     │   └── time.rs       时钟与阶段文案
-    └── ui/               终端界面
-        ├── mod.rs        App、标题流程、设置项
-        ├── game.rs       主循环、模式切换、结算与循环衔接
+    ├── ui.rs              App、标题流程、设置项
+    └── ui/                终端界面
+        ├── game/
+        │   ├── mod.rs    Game 状态机、主循环、结算与循环衔接
+        │   ├── input.rs  模式切换与按键映射
+        │   ├── combat.rs 战斗回合
+        │   └── view.rs   主界面渲染与行裁剪
+        ├── error.rs      错误信息屏幕与恢复选项（返回/保存/退出到标题）
         ├── combat.rs     战斗行动面板
         ├── panels.rs     状态、物资、地图、档案、日志、帮助
-        ├── format.rs     进度条与世界标签
         └── title.rs      标题画面渲染
 ```
 
 ## 数据文件
 
-所有数据都在 `data/` 下，使用 JSON5。可以用环境变量 `CHAOTIC_ASCENDING_DATA` 指向别的数据目录。
+所有数据都在 `data/` 下，使用 YAML（`*.yaml` / `*.yml`，由 `serde-saphyr` 解析）。YAML 里 `#` 开头的是注释；旧版的 JSON5 文件可用 `scripts/json5_to_yaml.py` 转换。可以用环境变量 `CHAOTIC_ASCENDING_DATA` 指向别的数据目录。
 
-### `data/config.json5`
+### `data/config.yaml`
 
 首次运行生成，也可以在游戏内设置界面修改。字段分四组：
 
@@ -62,16 +67,17 @@ chaotic_ascending/
 
 ### `data/content/`
 
-目录下的每个 `*.json5` 都是内容补丁，可以只定义任意区块（`creatures`、`items`、`sites`、`skills`、`intel`、`npcs`、`weaknesses`）。默认拆分为：
+目录下的每个 `*.yaml` / `*.yml` 都是内容补丁，可以只定义任意区块（`creatures`、`items`、`sites`、`skills`、`intel`、`npcs`、`weaknesses`、`history`）。默认拆分为：
 
-- `creatures.json5`：生物。字段包括 `human`（可作为人类宿主）、`brain`（具有类脑结构，可解剖并作为怪物宿主）、`habitats`（与地点 `tags` 匹配）、`friendly`、`weight`（遭遇权重）、`materials`（掉落材料）。
-- `items.json5`：物品。`kind` 取 `food / water / medicine / herb / vaccine / weapon / armor / device / material / key`；`power` 是效果强度；法器的 `magic_bonus` 会加到法术伤害上。
-- `sites.json5`：地点。`region` 决定默认厕所：城市/乡村有、无人区没有，可用 `toilet: true/false` 覆盖；`links` 必须双向；`loot` 按阶段过滤；`guarded` 地点需要通行；`story` 地点在搜索耗尽时触发剧情。
-- `skills.json5`：技能。`kind` 取 `innate / soul / psychic / magic`；`castable` 为真时才可被玩家重现；`cost` 为消耗量。
-- `items_expanded.json5`：生活物资补丁，追加食物、日用品、学校用品、工具与关键物。
-- `intel.json5`：结构化情报。`category` 取 `identity / map / note / network / rumor / other`；`importance` 取 `low / normal / high / critical`；`target_site` 用于核实；`ambiguous`/`fake` 控制模糊与假情报。
-- `npcs.json5`：NPC。`tags` 与地点标签匹配；`attributes` 是二级页面显示的属性；`intel` 引用情报 ID。
-- `weaknesses.json5`：弱点报告。`source` 取 `network / research / combat / dissection`，分别由网络公告、研究设施、反复攻击和解剖解锁。
+- `creatures.yaml`：生物。字段包括 `human`（可作为人类宿主）、`brain`（具有类脑结构，可解剖并作为怪物宿主）、`habitats`（与地点 `tags` 匹配）、`friendly`、`weight`（遭遇权重）、`materials`（掉落材料）。
+- `items.yaml`：物品。`kind` 取 `food / water / medicine / herb / vaccine / weapon / armor / device / material / key`；`power` 是效果强度；法器的 `magic_bonus` 会加到法术伤害上。
+- `sites.yaml`：地点。`region` 决定默认厕所：城市/乡村有、无人区没有，可用 `toilet: true/false` 覆盖；`links` 必须双向；`loot` 按阶段过滤；`guarded` 地点需要通行；`story` 地点在搜索耗尽时触发剧情。
+- `skills.yaml`：技能。`kind` 取 `innate / soul / psychic / magic`；`castable` 为真时才可被玩家重现；`cost` 为消耗量。
+- `items_expanded.yaml`：生活物资补丁，追加食物、日用品、学校用品、工具与关键物。
+- `intel.yaml`：结构化情报。`category` 取 `identity / map / note / network / rumor / other`；`importance` 取 `low / normal / high / critical`；`target_site` 用于核实；`ambiguous`/`fake` 控制模糊与假情报；`news_for` 指向关联纪事，监控网络时会优先播报已到期的新闻。
+- `npcs.yaml`：NPC。`tags` 与地点标签匹配；`attributes` 是二级页面显示的属性；`intel` 引用情报 ID。
+- `weaknesses.yaml`：弱点报告。`source` 取 `network / research / combat / dissection`，分别由网络公告、研究设施、反复攻击和解剖解锁；报告显示在对应生物的子页面。
+- `history.yaml`：预定义的世界历史轨迹。`phase` 用于分阶段展示，`date` 是解锁时间（游戏内以 `2026-09-26 00:00` 为第 1 天 00:00，显示为「时间 · 事件」），`title` 与 `text` 是正文。`unlock` 是条件列表，**任意一条**满足即可：`site_tag`、`site`、`intel`、`creature`、`broadcast`、`power`、`notification`、`alternate_space`、`research_record`。日期未到或条件未满足时，档案的「纪事」页只显示日期与条件提示。
 
 地点的补充字段：
 - `restock`：`never / possible / guaranteed`，决定每日刷新与 `?`/`!` 标记。
@@ -80,7 +86,7 @@ chaotic_ascending/
 - `vent` / `back_door` / `fire_escape`：可用的潜入路线。
 - `intel` / `npcs`：搜查可发现的情报与可能遇到的人物。
 
-加载器按文件名排序合并所有补丁，因此后加载的文件可以追加同一区块的条目。`Content::validate()` 会检查：ID 唯一、生物引用的技能与材料存在、地点链接双向、战利品物品存在、每个地点至少一次搜索、三个区域的起始地点都在。
+加载器按文件名排序合并所有补丁，因此后加载的文件可以追加同一区块的条目。`Content::validate()` 会检查：ID 唯一、生物引用的技能与材料存在、地点链接双向、战利品物品存在、每个地点至少一次搜索、三个区域的起始地点都在、纪事条目的阶段在 1–4 之间、日期可解析、解锁条件引用的地点/标签/情报/生物存在。
 
 `examples/split_content.rs` 演示如何把单文件内容拆成多份补丁。
 
@@ -93,7 +99,7 @@ chaotic_ascending/
 | 文件 | 内容 | 写入时机 |
 | --- | --- | --- |
 | `data/worlds/<名称>-<种子>.bin` | 世界状态、角色、日志、随机数状态、需求累积、循环统计 | 每 `autosave_turns` 个行动、退出、结算时 |
-| `data/archive.bin` | 跨循环档案：条目与信源、循环次数、死亡次数、渗透进度、情报状态、纪事、人物、弱点报告、模式解锁、阶段记忆、解剖记录 | 自动存档、结算、循环切换时 |
+| `data/archive.bin` | 跨循环档案：条目与信源、循环次数、死亡次数、渗透进度、情报状态、事件、人物、弱点报告、模式解锁、阶段记忆、解剖记录、纪事解锁与触发标记 | 自动存档、结算、循环切换时 |
 
 存档使用 bincode。`SAVE_VERSION` 不兼容的旧存档会被拒绝加载并提示新建世界；新增字段使用 `#[serde(default)]` 以便在同一版本内兼容。
 
@@ -110,7 +116,7 @@ chaotic_ascending/
 - **二维地图**：聚合人流模型（地点人口 + 通勤流 + 拥堵），不是逐人代理；每小时重算一次，旅行耗时为 O(距离)。感染沿路线传播，动乱由拥堵与感染合成。
 - **阶段判定**：`Config::phase(distortion)` 返回 1–4；默认第 2 天进入二阶段、约第 60 天进入三阶段、第 180 天进入四阶段。四阶段之后没有终局。
 - **探索与潜入**：搜索次数换算成百分比；商店按日刷新并在档案中记住必然刷新。有人地点取物按日期、时段和潜入路线计算目击概率，追击失败三次转入拘留。
-- **知识**：情报、NPC、纪事、弱点和信源都存放在 `Archive`，因此跨循环保留；假情报只在目标地点搜查后改变状态。
+- **知识**：情报、NPC、事件、弱点和信源都存放在 `Archive`，因此跨循环保留；假情报只在目标地点搜查后改变状态。弱点报告写入生物条目，不重复写入事件。纪事的解锁状态与触发标记也写入 `Archive`：`Sim::refresh_history()` 在每次时间推进、存档加载和循环开始时检查日期与条件，解锁后写日志、不写入事件。旧档案首次载入时按阶段补解锁一次。
 - **转生资格**：`Sim::available_hosts()` 同时检查循环次数、是否见过、人类/类脑标记、解剖记录和起始阶段。权限授予在 `transfer_to_host()` 中完成。
 - **转生资格**：`Sim::available_hosts()` 同时检查循环次数、是否见过、人类/类脑标记、解剖记录和起始阶段。权限授予在 `transfer_to_host()` 中完成。
 
@@ -118,7 +124,9 @@ chaotic_ascending/
 
 - `model/` 不依赖终端，可以无终端测试（`src/model/tests.rs`）。
 - `ui/` 只负责按键、菜单和渲染；所有规则判定（能否如厕、能否解剖、能否转生、能否重演阶段）都在模型层。
-- 阶段文案集中在 `model/time.rs`；标题与主菜单在 `data/titles.json5`（接口 `title::TitleConfig`，也可用 `App::set_language` 按需切换）；帮助文本与按键提示集中在 `ui/game.rs` 与 `ui/panels.rs`。
+- 阶段文案集中在 `model/time.rs`；标题与主菜单在 `data/titles.yaml`（接口 `title::TitleConfig`，也可用 `App::set_language` 按需切换）；帮助文本与按键提示集中在 `ui/game/` 与 `ui/panels.rs`。
+- 游戏内的 `Game` 同时持有 `Sim`、模式、速度、日志过滤、滚动位置和战斗面板，主循环与按键处理都是它的方法；`App` 只保留标题与跨循环档案。
+- 界面操作出错时由 `ui/error.rs` 显示错误信息屏幕：游戏内可选返回游戏、保存并退出到标题、不保存退出；标题界面可选返回标题或退出。自动存档失败不会反复提供同一次保存。
 - 日志带游戏时间、重要程度和类别，主界面与日志界面共用同一份过滤状态。
 
 ## 测试与检查

@@ -58,7 +58,8 @@ impl Sim {
     {
       return Err("存档中的当前地点已不存在，请检查 data/content/".into());
     }
-    Ok(Self {
+    let backfill_history = archive.runs > 0 && !archive.history_tracking;
+    let mut sim = Self {
       config,
       content,
       archive,
@@ -77,7 +78,9 @@ impl Sim {
       last_action: "继续".to_string(),
       pending_extra_ds: 0,
       actions: 0,
-    })
+    };
+    sim.init_history(backfill_history);
+    Ok(sim)
   }
 
   pub fn save(&self) -> Result<PathBuf, Box<dyn std::error::Error>> {
@@ -118,7 +121,7 @@ impl Sim {
       return archive;
     }
     // Saves from before the structured archive can still be read; they simply lack the newer
-    // sections (sources, intel, chronicle, NPCs, weaknesses).
+    // sections (sources, intel, events, NPCs, weaknesses).
     if let Ok(legacy) = bincode::deserialize::<crate::model::archive::LegacyArchive>(&bytes) {
       return legacy.into();
     }

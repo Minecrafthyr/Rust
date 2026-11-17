@@ -1,6 +1,7 @@
 use std::borrow::Cow;
 use std::cmp::Reverse;
 use std::collections::{BinaryHeap, HashMap};
+use std::error::Error;
 use std::sync::Arc;
 
 use itertools::Itertools;
@@ -164,7 +165,7 @@ impl Game {
     Ok(())
   }
 
-  pub fn bookmark_position(&mut self) -> Result<(), std::io::Error> {
+  pub fn bookmark_position(&mut self) -> Result<(), Box<dyn Error>> {
     self.player.bookmarks.push(self.player.position);
     ScreenWriter::new_screen()
       .message(t!("action.travel.bookmarked", count = self.player.bookmarks.len()))?;

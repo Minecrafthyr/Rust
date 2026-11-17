@@ -1,18 +1,22 @@
-use std::{error::Error, io::Write as _};
+use std::{error::Error, fmt::Write as _, io::Write as _};
 
 use crossterm::{
   cursor::position,
-  event::{Event, KeyCode, KeyEvent, read},
+  event::{Event, KeyCode::*, KeyEvent, read},
   terminal,
 };
+use iter_tools::Itertools;
 use or_strike::{
   io::ScreenWriter,
   ui::{DataItem, DisplayList},
 };
 
 use crate::{
-  content::{Content, Region},
-  model::{Archive, EntryKind, LogCategory, LogEntry, LogFilter, Sim, clock_text},
+  content::{Content, NpcAttribute, Region},
+  model::{
+    Archive, EntryKind, GameState, Inventory, LogCategory, LogEntry, LogFilter, Sim, clock_text,
+    phase_name,
+  },
   ui::menu,
 };
 
@@ -26,15 +30,12 @@ pub(super) fn wait_key() -> Result<(), Box<dyn Error>> {
   }
 }
 
-pub(super) fn view_lines(title: &str, lines: &[String]) -> Result<(), Box<dyn Error>> {
+pub(super) fn view_lines(title: &str, text: &str) -> Result<(), Box<dyn Error>> {
   let mut s = ScreenWriter::new_screen();
   writeln!(s, "{title}")?;
   writeln!(s, "[↑↓]滚动  [Esc]返回")?;
   let row = position().map_or(2, |(_, row)| row);
-  let mut content = lines.to_vec();
-  if content.is_empty() {
-    content.push("（无）".to_string());
-  }
+  let content = if text.is_empty() { vec!["（无）"] } else { text.lines().collect() };
   let items = content
     .into_iter()
     .map(|text| DataItem { text, selected: (), enter: |_| Ok(()) })
@@ -43,62 +44,62 @@ pub(super) fn view_lines(title: &str, lines: &[String]) -> Result<(), Box<dyn Er
   Ok(())
 }
 
-pub(super) fn status_lines(sim: &Sim) -> Vec<String> {
-  let player = &sim.state.player;
-  let mut lines = vec![
-    format!("{}  生命 {}/{}", player.name, player.health.max(0), player.max_health),
-    format!(
-      "饥饿 {}  疲倦 {}  口渴 {}  尿意 {}  便意 {}  感染 {}",
-      player.hunger, player.fatigue, player.thirst, player.bladder, player.bowel, player.infection
-    ),
-    format!(
-      "力量 {} 敏捷 {} 意志 {} 感知 {}",
-      player.effective_strength(),
-      player.effective_agility(),
-      player.effective_will(),
-      player.effective_perception()
-    ),
-    format!("灵 {}  法 {}  魂 {}", player.psychic, player.magic, player.soul),
-    format!(
-      "{} | {} | 扭曲 {:.1} | 厕所 {}",
-      sim.current_site().name,
-      clock_text(sim.state.world.clock_ds),
-      sim.state.world.distortion,
-      if sim.current_site().has_toilet() { "可用" } else { "就地解决" }
-    ),
-    format!(
-      "状态：{}",
-      if let Some(detention) = &sim.state.world.detention {
-        format!("被拘留至第 {} 天", detention.until_day)
-      } else if let Some(pursuit) = &sim.state.world.pursuit {
-        format!("被{}追击中", pursuit.witness)
-      } else {
-        "行动自由".to_string()
-      }
-    ),
-    format!(
-      "躯体：{} | 模式：{}",
-      player.body_id.as_ref().map_or("流浪者".to_string(), |id| {
-        sim
-          .content
-          .creatures
-          .iter()
-          .find(|creature| &creature.id == id)
-          .map_or(id.clone(), |creature| creature.name.clone())
-      }),
-      if sim.modes_unlocked() { "半自动/手动已解锁" } else { "第一循环仅全自动" }
-    ),
-    String::new(),
-    "身体系统".to_string(),
-  ];
+pub(super) fn status_text(sim: &Sim) -> Result<String, Box<dyn Error>> {
+  let GameState { world, player, .. } = &sim.state;
+  let site = sim.current_site();
+  let mut text = String::new();
+  writeln!(text, "{}  生命 {}/{}", player.name, player.health.max(0), player.max_health)?;
+  writeln!(
+    text,
+    "饥饿 {}  疲倦 {}  口渴 {}  尿意 {}  便意 {}  感染 {}",
+    player.hunger, player.fatigue, player.thirst, player.bladder, player.bowel, player.infection
+  )?;
+  writeln!(
+    text,
+    "力量 {} 敏捷 {} 意志 {} 感知 {}",
+    player.effective_strength(),
+    player.effective_agility(),
+    player.effective_will(),
+    player.effective_perception()
+  )?;
+  writeln!(text, "灵 {}  法 {}  魂 {}", player.psychic, player.magic, player.soul)?;
+  writeln!(
+    text,
+    "{} | {} | 扭曲 {:.1} | 厕所 {}",
+    site.name,
+    clock_text(world.clock_ds),
+    world.distortion,
+    if site.has_toilet() { "可用" } else { "就地解决" }
+  )?;
+  let status = if let Some(detention) = &world.detention {
+    format!("被拘留至第 {} 天", detention.until_day)
+  } else if let Some(pursuit) = &world.pursuit {
+    format!("被{}追击中", pursuit.witness)
+  } else {
+    "行动自由".to_string()
+  };
+  writeln!(text, "状态：{status}")?;
+  let body = player.body_id.as_ref().map_or("流浪者".to_string(), |id| {
+    sim
+      .content
+      .creatures
+      .iter()
+      .find(|creature| &creature.id == id)
+      .map_or(id.clone(), |creature| creature.name.clone())
+  });
+  let mode =
+    if sim.modes_unlocked() { "半自动/手动已解锁" } else { "第一循环仅全自动" };
+  writeln!(text, "躯体：{body} | 模式：{mode}")?;
+  writeln!(text)?;
+  writeln!(text, "身体系统")?;
   for system in player.systems() {
-    lines.push(format!("  {} {:>3}%", system.name, system.condition));
+    writeln!(text, "  {} {:>3}%", system.name, system.condition)?;
   }
-  if let Some(detention) = &sim.state.world.detention {
-    lines.push(String::new());
-    lines.push(format!("拘留：{}", detention.reason));
+  if let Some(detention) = &world.detention {
+    writeln!(text)?;
+    writeln!(text, "拘留：{}", detention.reason)?;
     if detention.confiscated.is_empty() {
-      lines.push("  已交出：无".to_string());
+      writeln!(text, "  已交出：无")?;
     } else {
       let items = detention
         .confiscated
@@ -106,55 +107,57 @@ pub(super) fn status_lines(sim: &Sim) -> Vec<String> {
         .map(|(id, count)| format!("{}×{count}", sim.content.item_name(id)))
         .collect::<Vec<_>>()
         .join("、");
-      lines.push(format!("  已交出：{items}"));
+      writeln!(text, "  已交出：{items}")?;
     }
   }
-  lines.push(String::new());
-  lines.push(format!(
+  writeln!(text)?;
+  writeln!(
+    text,
     "档案 {} 条 | 循环 {} 次 | 死亡 {} 次 | 最长 {} 回合",
     sim.archive.entries.len(),
     sim.archive.runs,
     sim.archive.deaths,
     sim.archive.best_turn
-  ));
-  lines
+  )?;
+  Ok(text)
 }
 
-pub(super) fn inventory_lines(sim: &Sim) -> Vec<String> {
+pub(super) fn inventory_text(sim: &Sim) -> Result<String, Box<dyn Error>> {
   let player = &sim.state.player;
-  let mut lines = vec![
-    format!(
-      "武器：{}",
-      player.inventory.weapon.as_ref().map_or("无".to_string(), |stack| format!(
+  let Inventory { stacks, weapon, armor } = &player.inventory;
+  let mut text = String::new();
+  let weapon = weapon.as_ref().map_or_else(
+    || "无".to_string(),
+    |stack| {
+      format!(
         "{} +{} 法术+{}",
         sim.content.item_name(&stack.id),
         stack.power(&sim.content),
         stack.magic_bonus(&sim.content)
-      ))
-    ),
-    format!(
-      "防具：{}",
-      player.inventory.armor.as_ref().map_or("无".to_string(), |stack| format!(
-        "{} +{}",
-        sim.content.item_name(&stack.id),
-        stack.power(&sim.content)
-      ))
-    ),
-    String::new(),
-  ];
-  if player.inventory.stacks.is_empty() {
-    lines.push("背包：空".to_string());
+      )
+    },
+  );
+  let armor = armor.as_ref().map_or_else(
+    || "无".to_string(),
+    |stack| format!("{} +{}", sim.content.item_name(&stack.id), stack.power(&sim.content)),
+  );
+  writeln!(text, "武器：{weapon}")?;
+  writeln!(text, "防具：{armor}")?;
+  writeln!(text)?;
+  if stacks.is_empty() {
+    writeln!(text, "背包：空")?;
   } else {
-    for stack in &player.inventory.stacks {
+    for stack in stacks {
       let name = sim.content.item_name(&stack.id);
-      lines.push(format!("{name} ×{}  {:.0}%", stack.count, stack.quality * 100.0));
+      writeln!(text, "{name} ×{}  {:.0}%", stack.count, stack.quality * 100.0)?;
     }
   }
-  lines
+  Ok(text)
 }
 
-pub(super) fn map_lines(sim: &Sim) -> Vec<String> {
-  let map = &sim.state.world.map;
+pub(super) fn map_text(sim: &Sim) -> Result<String, Box<dyn Error>> {
+  let world = &sim.state.world;
+  let map = &world.map;
   let view_width = usize::from(map.width / 2);
   let view_height = usize::from(map.height / 2);
   let mut grid = vec![vec![' '; view_width]; view_height];
@@ -170,21 +173,17 @@ pub(super) fn map_lines(sim: &Sim) -> Vec<String> {
           density = density.saturating_add(map.density_at(x, y));
         }
       }
-      *cell = if traffic >= 70 {
-        '▓'
-      } else if traffic >= 40 {
-        '▒'
-      } else if traffic >= 15 {
-        '░'
-      } else if density >= 120 {
-        '·'
-      } else {
-        ' '
+      *cell = match () {
+      _ if traffic >= 70 => '▓',
+      _ if traffic >= 40 => '▒',
+      _ if traffic >= 15 => '░',
+      _ if density >= 120 => '·',
+      _ => ' ',
       };
     }
   }
   for def in sim.all_site_defs() {
-    let Some(state) = sim.state.world.site(&def.id) else {
+    let Some(state) = world.site(&def.id) else {
       continue;
     };
     if !state.discovered {
@@ -193,16 +192,12 @@ pub(super) fn map_lines(sim: &Sim) -> Vec<String> {
     let Some((x, y)) = map.position(&def.id) else {
       continue;
     };
-    let marker = if def.id == sim.state.world.current {
-      '@'
-    } else if state.infected >= 50 {
-      'z'
-    } else if def.guarded {
-      '!'
-    } else if def.has_toilet() {
-      'T'
-    } else {
-      'o'
+    let marker = match () {
+    _ if def.id == world.current => '@',
+    _ if state.infected >= 50 => 'z',
+    _ if def.guarded => '!',
+    _ if def.has_toilet() => 'T',
+    _ => 'o',
     };
     if let Some(row) = grid.get_mut(usize::from(y / 2))
       && let Some(cell) = row.get_mut(usize::from(x / 2))
@@ -210,30 +205,30 @@ pub(super) fn map_lines(sim: &Sim) -> Vec<String> {
       *cell = marker;
     }
   }
-  let mut lines = vec![
-    format!(
-      "已发现 {}/{}  已调查 {}  [@]你 [o]地点 [T]厕所 [!]机密 [z]高感染 [·/░/▒/▓]拥堵",
-      sim.state.world.discovered_count(),
-      sim.state.world.sites.len(),
-      sim.state.world.visited_count()
-    ),
-    String::new(),
-  ];
+  let mut text = String::new();
+  writeln!(
+    text,
+    "已发现 {}/{}  已调查 {}  [@]你 [o]地点 [T]厕所 [!]机密 [z]高感染 [·/░/▒/▓]拥堵",
+    world.discovered_count(),
+    world.sites.len(),
+    world.visited_count()
+  )?;
+  writeln!(text)?;
   for row in grid {
-    lines.push(row.into_iter().collect::<String>().trim_end().to_string());
+    writeln!(text, "{}", row.into_iter().collect::<String>().trim_end())?;
   }
-  lines.push(String::new());
+  writeln!(text)?;
   for region in Region::ALL {
     let mut entries = sim
       .all_site_defs()
       .into_iter()
       .filter(|def| def.region == region)
       .filter_map(|def| {
-        let state = sim.state.world.site(&def.id)?;
+        let state = world.site(&def.id)?;
         if !state.discovered {
           return None;
         }
-        let marker = if def.id == sim.state.world.current { "*" } else { "-" };
+        let marker = if def.id == world.current { "*" } else { "-" };
         let refresh = sim.refresh_marker(def);
         let progress = if state.visited {
           format!("[已探索 {}%{}]", state.explored_percent(), refresh)
@@ -256,27 +251,30 @@ pub(super) fn map_lines(sim: &Sim) -> Vec<String> {
       continue;
     }
     entries.sort();
-    lines.push(region.name().to_string());
-    lines.extend(entries);
+    writeln!(text, "{}", region.name())?;
+    for entry in entries {
+      writeln!(text, "{entry}")?;
+    }
   }
   let current = sim.current_site();
-  if let Some(state) = sim.state.world.site(&sim.state.world.current)
+  if let Some(state) = world.site(&world.current)
     && state.visited
   {
     let traffic = map.position(&current.id).map_or(0, |(x, y)| map.congestion_at(x, y));
-    lines.push(String::new());
-    lines.push(format!(
+    writeln!(text)?;
+    writeln!(
+      text,
       "{}：人流 {}  感染 {}%  拥堵 {}%",
       current.name, state.population, state.infected, traffic
-    ));
-    lines.push(current.desc.clone());
+    )?;
+    writeln!(text, "{}", current.desc)?;
     if current.guarded {
       let contacts = sim.archive.contact_count(&current.id);
       let access = if sim.archive.has_access(&current.id) { "已通行" } else { "受限" };
-      lines.push(format!("通行：{access}  接触 {contacts}/3"));
+      writeln!(text, "通行：{access}  接触 {contacts}/3")?;
     }
   }
-  lines
+  Ok(text)
 }
 
 pub(super) fn archive_view(
@@ -284,18 +282,19 @@ pub(super) fn archive_view(
 ) -> Result<(), Box<dyn Error>> {
   loop {
     s.reset_pos()?;
-    let labels = EntryKind::all()
-      .into_iter()
-      .map(|kind| format!("{} {}", kind.name(), archive.count_of(kind)))
-      .chain(std::iter::once(format!("情报 {}", archive.intel_entries.len())))
-      .chain(std::iter::once(format!("人物 {}", archive.npcs.len())))
-      .chain(std::iter::once(format!("纪事 {}", archive.chronicle.len())))
-      .chain(std::iter::once("返回".to_string()))
-      .collect::<Vec<_>>();
+    let unlocked_history =
+      content.history.iter().filter(|entry| archive.history_unlocked(&entry.id)).count();
     let Some(choice) = menu(
       s,
       &format!("档案  循环{} 死亡{} 最长{}回合", archive.runs, archive.deaths, archive.best_turn),
-      labels,
+      EntryKind::all()
+        .into_iter()
+        .map(|kind| format!("{} {}", kind.name(), archive.count_of(kind)))
+        .chain(std::iter::once(format!("情报 {}", archive.intel_entries.len())))
+        .chain(std::iter::once(format!("人物 {}", archive.npcs.len())))
+        .chain(std::iter::once(format!("纪事 {unlocked_history}/{}", content.history.len())))
+        .chain(std::iter::once(format!("事件 {}", archive.events.len())))
+        .chain(std::iter::once("返回".to_string())),
     )?
     else {
       return Ok(());
@@ -308,7 +307,8 @@ pub(super) fn archive_view(
     match choice - EntryKind::all().len() {
     0 => intel_view(s, archive, content)?,
     1 => npc_view(s, archive, content)?,
-    2 => chronicle_view(s, archive)?,
+    2 => history_view(content, archive)?,
+    3 => event_view(archive)?,
     _ => return Ok(()),
     }
   }
@@ -324,84 +324,85 @@ fn archive_kind_view(
     wait_key()?;
     return Ok(());
   }
-  let labels =
-    entries.iter().map(|entry| format!("{} ({})", entry.name, entry.seen)).collect::<Vec<_>>();
-  let Some(index) = menu(s, kind.name(), labels)? else {
+  let Some(index) =
+    menu(s, kind.name(), entries.iter().map(|entry| format!("{} ({})", entry.name, entry.seen)))?
+  else {
     return Ok(());
   };
   let entry = entries[index];
-  let mut lines = Vec::new();
+  let mut text = String::new();
   if kind == EntryKind::Site && !entry.visited {
-    lines.push("尚未抵达，详细信息未知。".to_string());
+    writeln!(text, "尚未抵达，详细信息未知。")?;
   } else {
-    lines.push(entry.desc.clone());
+    writeln!(text, "{}", entry.desc)?;
   }
-  lines.push(String::new());
-  lines.push(format!("首次 {} | 最近 {} | 观察 {}", entry.first_turn, entry.last_turn, entry.seen));
+  writeln!(text)?;
+  writeln!(text, "首次 {} | 最近 {} | 观察 {}", entry.first_turn, entry.last_turn, entry.seen)?;
   if !entry.sources.is_empty() {
-    lines
-      .push(format!("情报来源：{}", entry.sources.iter().cloned().collect::<Vec<_>>().join("、")));
+    let sources = entry.sources.iter().cloned().collect::<Vec<_>>().join("、");
+    writeln!(text, "情报来源：{sources}")?;
   }
   if kind == EntryKind::Site {
     if archive.has_access(&entry.id) {
-      lines.push("通行：已获得".to_string());
+      writeln!(text, "通行：已获得")?;
     }
     if archive.has_intel(&entry.id) {
-      lines.push("关键情报：已获得".to_string());
+      writeln!(text, "关键情报：已获得")?;
     }
     let contacts = archive.contact_count(&entry.id);
     if contacts > 0 {
-      lines.push(format!("接触守卫：{contacts} 次"));
+      writeln!(text, "接触守卫：{contacts} 次")?;
     }
     if let Some(def) = content.site(&entry.id) {
-      lines.push(format!("补给刷新：{}", def.restock.name()));
+      writeln!(text, "补给刷新：{}", def.restock.name())?;
     }
   }
   if kind == EntryKind::Creature {
     let creature = content.creatures.iter().find(|creature| creature.id == entry.id);
     if let Some(creature) = creature {
-      lines.push(if creature.human {
-        "躯体检定：人形，可直接转移".to_string()
+      let verdict = if creature.human {
+        "躯体检定：人形，可直接转移"
       } else if creature.brain {
-        "躯体检定：有类脑结构，可解剖".to_string()
+        "躯体检定：有类脑结构，可解剖"
       } else {
-        "躯体检定：没有可辨认的类脑结构".to_string()
-      });
+        "躯体检定：没有可辨认的类脑结构"
+      };
+      writeln!(text, "{verdict}")?;
       if archive.is_dissected(&entry.id) {
-        lines.push("解剖：已完成".to_string());
+        writeln!(text, "解剖：已完成")?;
       }
     }
-    lines.push(String::new());
-    lines.push("弱点报告".to_string());
+    writeln!(text)?;
+    writeln!(text, "弱点报告")?;
     let weaknesses = content.weaknesses_for(&entry.id).collect::<Vec<_>>();
     let known = weaknesses
       .iter()
       .filter(|weakness| archive.has_weakness(&entry.id, &weakness.id))
       .collect::<Vec<_>>();
     if known.is_empty() {
-      lines.push("  尚未掌握。可通过网络公告、研究设施、反复战斗或解剖获知。".to_string());
+      writeln!(text, "  尚未掌握。可通过网络公告、研究设施、反复战斗或解剖获知。")?;
     } else {
       for weakness in &known {
-        lines.push(format!("  {}（{}）：{}", weakness.name, weakness.source.name(), weakness.desc));
+        writeln!(text, "  {}（{}）：{}", weakness.name, weakness.source.name(), weakness.desc)?;
       }
-      lines.push(format!("  已掌握 {}/{} 条弱点报告。", known.len(), weaknesses.len()));
+      writeln!(text, "  已掌握 {}/{} 条弱点报告。", known.len(), weaknesses.len())?;
     }
     if let Some(hits) = archive.creature_hits.get(&entry.id) {
-      lines.push(format!("  交手次数：{hits}"));
+      writeln!(text, "  交手次数：{hits}")?;
     }
   }
   if kind == EntryKind::Skill
     && let Some(skill) = content.skill(&entry.id)
   {
-    lines.push(format!("{} | 阶段{} | 消耗{}", skill.kind.name(), skill.phase, skill.cost));
+    writeln!(text, "{} | 阶段{} | 消耗{}", skill.kind.name(), skill.phase, skill.cost)?;
     if skill.power > 0 {
-      lines.push(format!("伤害 {}", skill.power));
+      writeln!(text, "伤害 {}", skill.power)?;
     }
     if skill.heal > 0 {
-      lines.push(format!("治疗 {}", skill.heal));
+      writeln!(text, "治疗 {}", skill.heal)?;
     }
   }
-  view_lines(&entry.name, &lines)?;
+  view_lines(&entry.name, &text)?;
   Ok(())
 }
 
@@ -451,45 +452,48 @@ fn intel_view(
     if entries.is_empty() {
       continue;
     }
-    let labels = entries
-      .iter()
-      .map(|def| {
+    let Some(index) = menu(
+      s,
+      category.name(),
+      entries.iter().map(|def| {
         let record = archive.intel_record(&def.id);
         let status = record.map_or("未核实", |record| record.status.name());
         format!("[{}] {}（{}）", def.importance.name(), def.title, status)
-      })
-      .collect::<Vec<_>>();
-    let Some(index) = menu(s, category.name(), labels)? else {
+      }),
+    )?
+    else {
       continue;
     };
     let def = entries[index];
     let record = archive.intel_record(&def.id);
-    let mut lines = vec![
-      format!("类别：{} | 重要程度：{}", def.category.name(), def.importance.name()),
-      format!("状态：{}", record.map_or("未核实", |record| record.status.name())),
-    ];
+    let mut text = String::new();
+    writeln!(text, "类别：{} | 重要程度：{}", def.category.name(), def.importance.name())?;
+    writeln!(text, "状态：{}", record.map_or("未核实", |record| record.status.name()))?;
     if def.ambiguous {
-      lines.push("情报性质：模糊（提供者没有深入探索，细节可能不完整）".to_string());
+      writeln!(text, "情报性质：模糊（提供者没有深入探索，细节可能不完整）")?;
     }
-    lines.push(String::new());
-    lines.push(def.content.clone());
-    lines.push(String::new());
+    writeln!(text)?;
+    writeln!(text, "{}", def.content)?;
+    writeln!(text)?;
     if let Some(record) = record {
       if !record.sources.is_empty() {
-        lines.push(format!(
-          "情报来源：{}",
-          record.sources.iter().cloned().collect::<Vec<_>>().join("、")
-        ));
+        let sources = record.sources.iter().cloned().collect::<Vec<_>>().join("、");
+        writeln!(text, "情报来源：{sources}")?;
       }
-      lines.push(format!("初次获得：第 {} 回合", record.learned_turn));
+      writeln!(text, "初次获得：第 {} 回合", record.learned_turn)?;
       if let Some(turn) = record.resolved_turn {
-        lines.push(format!("核实于：第 {turn} 回合"));
+        writeln!(text, "核实于：第 {turn} 回合")?;
       }
     }
     if let Some(site) = &def.target_site {
-      lines.push(format!("地点：{}", content.site_name(site)));
+      writeln!(text, "地点：{}", content.site_name(site))?;
     }
-    view_lines(&def.title, &lines)?;
+    if let Some(id) = &def.news_for
+      && let Some(entry) = content.history.iter().find(|entry| entry.id == *id)
+    {
+      writeln!(text, "关联纪事：{}", entry.title)?;
+    }
+    view_lines(&def.title, &text)?;
   }
 }
 
@@ -506,77 +510,123 @@ fn npc_view(
   }
   loop {
     s.reset_pos()?;
-    let labels = known.iter().map(|npc| npc.name.clone()).collect::<Vec<_>>();
-    let Some(index) = menu(s, "人物（选择后进入二级页面）", labels)? else {
+    let Some(index) = menu(s, "人物（选择后进入二级页面）", known.iter().map(|npc| &npc.name))?
+    else {
       return Ok(());
     };
     let npc = known[index];
     let record = archive.npc_record(&npc.id);
-    let mut lines = vec![
-      format!("{} | {}", npc.name, npc.role),
-      if npc.faction.is_empty() { String::new() } else { format!("所属：{}", npc.faction) },
-      String::new(),
-      npc.desc.clone(),
-      String::new(),
-      "属性".to_string(),
-    ];
+    let mut text = String::new();
+    writeln!(text, "{} | {}", npc.name, npc.role)?;
+    if !npc.faction.is_empty() {
+      writeln!(text, "所属：{}", npc.faction)?;
+    }
+    writeln!(text, "\n{}\n属性\n", npc.desc)?;
     if npc.attributes.is_empty() {
-      lines.push("  （没有记录到具体属性）".to_string());
+      writeln!(text, "  （没有记录到具体属性）")?;
     } else {
-      for attribute in &npc.attributes {
-        lines.push(format!("  {}：{}", attribute.label, attribute.value));
+      for NpcAttribute { label, value } in &npc.attributes {
+        writeln!(text, "  {label}：{value}")?;
       }
     }
     if let Some(record) = record {
-      lines.push(format!(
+      writeln!(
+        text,
         "相遇 {} 次 | 首次第 {} 回合 | 最近第 {} 回合",
         record.seen, record.first_turn, record.last_turn
-      ));
+      )?;
     }
-    lines.push(String::new());
-    lines.push("他告诉你的情报".to_string());
-    let told = record.map(|record| record.intel.clone()).unwrap_or_default();
-    if told.is_empty() {
-      lines.push("  （还没有得到情报）".to_string());
-    } else {
+    writeln!(text, "\n他告诉你的情报")?;
+    match record.map(|record| &record.intel) {
+    Some(told) if !told.is_empty() =>
       for id in told {
-        if let Some(def) = content.intel(&id) {
-          lines.push(format!("  {}：{}", def.title, def.content));
-          if let Some(record) = archive.intel_record(&id) {
-            lines.push(format!(
-              "    状态：{} | 来源：{}",
-              record.status.name(),
-              record.sources.iter().cloned().collect::<Vec<_>>().join("、")
-            ));
-          }
+        let Some(def) = content.intel(id) else { continue };
+        writeln!(text, "  {}：{}", def.title, def.content)?;
+        if let Some(record) = archive.intel_record(id) {
+          let sources = record.sources.iter().join("、");
+          writeln!(text, "    状态：{} | 来源：{sources}", record.status.name())?;
         }
-      }
+      },
+    _ => writeln!(text, "  （还没有得到情报）")?,
     }
-    view_lines(&npc.name, &lines)?;
+    view_lines(&npc.name, &text)?;
   }
 }
 
-fn chronicle_view(_s: &mut ScreenWriter, archive: &Archive) -> Result<(), Box<dyn Error>> {
-  let mut lines = archive
-    .chronicle
-    .iter()
-    .map(|entry| {
-      format!(
-        "第{}次循环 · 第{}回合 · {}{} {}",
-        entry.cycle,
-        entry.turn,
-        entry.severity.prefix(),
-        clock_text(entry.clock_ds),
-        entry.text
-      )
-    })
-    .collect::<Vec<_>>();
-  if lines.is_empty() {
-    lines.push("还没有值得记入纪事的大事。".to_string());
+/// The chronicle is predefined world history (background), not a log of the character's actions.
+///
+/// An entry appears once its date has passed and one of its unlock conditions has been met;
+/// locked entries show only their date and a hint, never the text.
+fn history_view(content: &Content, archive: &Archive) -> Result<(), Box<dyn Error>> {
+  let mut text = String::new();
+  let mut heading = 0u8;
+  let mut shown = 0usize;
+  for entry in &content.history {
+    if !archive.history_unlocked(&entry.id) {
+      continue;
+    }
+    if entry.phase != heading {
+      if heading != 0 {
+        writeln!(text)?;
+      }
+      heading = entry.phase;
+      writeln!(text, "【{}】", phase_name(heading))?;
+    }
+    let date = if entry.date.is_empty() { String::new() } else { format!("{} · ", entry.date) };
+    writeln!(text, "{date}{}", entry.title)?;
+    for line in entry.text.lines() {
+      writeln!(text, "  {line}")?;
+    }
+    writeln!(text)?;
+    shown += 1;
   }
-  lines.push(String::new());
-  lines.push("纪事跨循环保留，记录阶段变化、死亡、拘留、重大情报与弱点报告。".to_string());
-  view_lines("纪事", &lines)
+  if shown == 0 {
+    writeln!(text, "世界的历史还没有留下可以阅读的记录。")?;
+  }
+  let locked = content.history.iter().filter(|entry| !archive.history_unlocked(&entry.id));
+  let mut locked_count = 0usize;
+  let mut locked_text = String::new();
+  for entry in locked {
+    let date = if entry.date.is_empty() { String::new() } else { format!("{} · ", entry.date) };
+    let condition = if entry.unlock.is_empty() {
+      "到达对应时间".to_string()
+    } else {
+      entry.unlock.iter().map(|condition| condition.hint(content)).collect::<Vec<_>>().join(" / ")
+    };
+    writeln!(locked_text, "  {date}？？？——需要：{condition}")?;
+    locked_count += 1;
+  }
+  if locked_count > 0 {
+    writeln!(text)?;
+    writeln!(text, "尚未解锁的纪事（{locked_count} 条）")?;
+    write!(text, "{locked_text}")?;
+    writeln!(text, "\n条件必须在对应时间之后达成，才会解锁纪事。")?;
+  }
+  view_lines("纪事", &text)
+}
+
+/// Cross-cycle record of what happened to this world and this character.
+fn event_view(archive: &Archive) -> Result<(), Box<dyn Error>> {
+  let mut text = String::new();
+  for entry in &archive.events {
+    writeln!(
+      text,
+      "第{}次循环 · 第{}回合 · {}{} {}",
+      entry.cycle,
+      entry.turn,
+      entry.severity.prefix(),
+      clock_text(entry.clock_ds),
+      entry.text
+    )?;
+  }
+  if archive.events.is_empty() {
+    writeln!(text, "还没有值得记入事件的大事。")?;
+  }
+  writeln!(
+    text,
+    "\n事件跨循环保留，记录循环开始与结束、阶段变化、拘留和重大情报；弱点报告见对应生物的子页面。"
+  )?;
+  view_lines("事件", &text)
 }
 
 pub(super) fn log_view(log: &[LogEntry], filter: &mut LogFilter) -> Result<(), Box<dyn Error>> {
@@ -612,15 +662,15 @@ pub(super) fn log_view(log: &[LogEntry], filter: &mut LogFilter) -> Result<(), B
       continue;
     }
     match code {
-    KeyCode::Esc | KeyCode::Enter => return Ok(()),
-    KeyCode::Up => scroll = scroll.saturating_add(1).min(max_scroll),
-    KeyCode::Down => scroll = scroll.saturating_sub(1),
-    KeyCode::PageUp => scroll = scroll.saturating_add(visible).min(max_scroll),
-    KeyCode::PageDown => scroll = scroll.saturating_sub(visible),
-    KeyCode::Char('+') | KeyCode::Char('=') => filter.severity = filter.severity.bumped(1),
-    KeyCode::Char('-') => filter.severity = filter.severity.bumped(-1),
-    KeyCode::Char('0') => filter.all_categories(),
-    KeyCode::Char(character) =>
+    Esc | Enter => return Ok(()),
+    Up => scroll = scroll.saturating_add(1).min(max_scroll),
+    Down => scroll = scroll.saturating_sub(1),
+    PageUp => scroll = scroll.saturating_add(visible).min(max_scroll),
+    PageDown => scroll = scroll.saturating_sub(visible),
+    Char('+') | Char('=') => filter.severity = filter.severity.bumped(1),
+    Char('-') => filter.severity = filter.severity.bumped(-1),
+    Char('0') => filter.all_categories(),
+    Char(character) =>
       if let Some(category) =
         LogCategory::all().into_iter().find(|category| category.letter() == character)
       {
@@ -632,22 +682,19 @@ pub(super) fn log_view(log: &[LogEntry], filter: &mut LogFilter) -> Result<(), B
 }
 
 pub(super) fn help_view() -> Result<(), Box<dyn Error>> {
-  view_lines("帮助", &[
-    "全自动：程序探索、休息、战斗；半自动：你选择日常行动，普通战斗自动结算。".to_string(),
-    "手动：你选择日常行动与全部战斗行动。第一循环只能全自动，结束后解锁其余模式。".to_string(),
-    "暂停时[↑↓/PgUp/PgDn]滚动主界面日志，[Home]回到最新。".to_string(),
-    "[空格]暂停/继续  [Tab]切换模式  [+/-]速度  [.]单步".to_string(),
-    "[s]状态  [a]档案  [j]日志  [i]物资  [m]地图  [q]保存退出".to_string(),
-    "半自动/手动：[e]搜索 [r]休息 [t]移动 [f]进食 [w]饮水 [b]如厕 [d]解剖 [h]治疗 [n]监控"
-      .to_string(),
-    "拿走物资被发现会触发追击；钻通风口、没人时走后门或消防通道可避免；被捕会没收赃物并在第二天离开看守所。".to_string(),
-    "有救济粮的地点按 [g] 领取，持续到第 7 天。 [z] 原地等待。".to_string(),
-    "探索百分比表示大致调查进度；? 表示可能刷新，! 表示档案已确认必然刷新。".to_string(),
-    "城市与乡村地点有厕所；无人区没有厕所，只能就地解决。".to_string(),
-    "第五循环起可转入见过的人类躯体；拒绝转移不会影响通关，只会更难接触机密。".to_string(),
-    "第四阶段后可解剖类脑怪物，并在新循环转入其躯体；届时可选从第二/三阶段开始。".to_string(),
-    "日志：[-/+]等级，[字母]类别，[0]全选。".to_string(),
-    "地点：探索、交流、网络监控或情报交换后才会发现；未调查不显示详情。".to_string(),
-    "机密地点有守卫：反复接触或掌握关键情报后可潜入。".to_string(),
-  ])
+  view_lines("帮助", "全自动：程序探索、休息、战斗；半自动：你选择日常行动，普通战斗自动结算。
+手动：你选择日常行动与全部战斗行动。第一循环只能全自动，结束后解锁其余模式。
+暂停时[↑↓/PgUp/PgDn]滚动主界面日志，[Home]回到最新。
+[空格]暂停/继续  [Tab]切换模式  [+/-]速度  [.]单步
+[s]状态  [a]档案  [j]日志  [i]物资  [m]地图  [q]保存退出
+半自动/手动：[e]搜索 [r]休息 [t]移动 [f]进食 [w]饮水 [b]如厕 [d]解剖 [h]治疗 [n]监控
+拿走物资被发现会触发追击；钻通风口、没人时走后门或消防通道可避免；被捕会没收赃物并在第二天离开看守所。
+有救济粮的地点按 [g] 领取，持续到第 7 天。 [z] 原地等待。
+探索百分比表示大致调查进度；? 表示可能刷新，! 表示档案已确认必然刷新。
+城市与乡村地点有厕所；无人区没有厕所，只能就地解决。
+第五循环起可转入见过的人类躯体；拒绝转移不会影响通关，只会更难接触机密。
+第四阶段后可解剖类脑怪物，并在新循环转入其躯体；届时可选从第二/三阶段开始。
+日志：[-/+]等级，[字母]类别，[0]全选。
+地点：探索、交流、网络监控或情报交换后才会发现；未调查不显示详情。
+机密地点有守卫：反复接触或掌握关键情报后可潜入。")
 }
