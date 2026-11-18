@@ -1,6 +1,6 @@
 - Use newest rust syntax (edition 2024, rustc nightly) and use experimental features, for example: default_field_values, const_trait_impl.
-- Large `mod` should move to separate to a new file.
 - When writing multiple enum variants, use `use Enum::*`.
-- Use `String` less, instead using `Write` trait macros (write!, writeln!, etc.).
+- Use `String` less, instead using `Write` trait macros (`write!`, `writeln!`, etc.).
+- Large `mod` should move to separate to a new file.
+- DO NOT use `mod.rs`, instead just use module name.
 - Write comments only when necessary.
-- DO NOT use mod.rs, instead just use module name.
